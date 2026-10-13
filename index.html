@@ -235,8 +235,8 @@ const mapMaterial=x=>({id:x.id,date:x.work_date,name:x.name,spec:x.spec||'',unit
 
 /* ---- 数据加载（按表，一次到位）---- */
 function setCloud(t){const el=$('#cloudStatus');if(el)el.textContent=t}
-async function loadAllData(){
- setCloud('☁️ 数据加载中...');
+async function loadAllData(silent){
+ if(!silent)setCloud('☁️ 数据加载中...');
  const [em,pr,re,tw,ma]=await Promise.all([
   sb.from('employees').select('*').order('id'),
   sb.from('products').select('*').order('id'),
@@ -250,7 +250,7 @@ async function loadAllData(){
  DB.records=re.data.map(mapRecord);
  DB.materials=ma.data.map(mapMaterial);
  DB.timeWages={};tw.data.forEach(x=>DB.timeWages[x.id]=Number(x.amount));
- dataReady=true;setCloud('☁️ 已连接 · 实时同步');
+ dataReady=true;if(!silent)setCloud('☁️ 已连接 · 实时同步');
 }
 
 /* ---- 行级 CRUD ---- */
@@ -306,6 +306,9 @@ async function afterAuth(session){
  try{
   if(!dataReady)await loadAllData();
   subscribeRealtime();
+  /* 兜底：Realtime 若未覆盖某表，每25秒静默轮询；切回本标签立即刷新，保证多人录入近实时可见 */
+  setInterval(async()=>{try{await loadAllData(true);safeRender()}catch(e){}},25000);
+  document.addEventListener('visibilitychange',async()=>{if(!document.hidden){try{await loadAllData(true);safeRender()}catch(e){}}});
   $('#todayPill').textContent='今天：'+today();
   navigate('dashboard');
   audit('登录',me.userName,null);
