@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>生产计件工资管理系统</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <style>
 :root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--line:#334155;--txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;--accent:#f97316;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--yellow:#facc15}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -16,9 +14,6 @@ body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background
 .main{margin-left:220px;height:100vh;position:relative;overflow:hidden}
 .topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;justify-content:space-between}
 .content{position:fixed;top:56px;left:220px;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:24px}
-.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;overflow:hidden}
-.charts-grid>*{min-width:0;overflow:hidden}
-.chart-box{height:320px;min-width:0;width:100%;overflow:hidden}
 .logo{padding:20px;border-bottom:1px solid var(--line)}
 .logo h1{font-size:18px;color:var(--accent)}
 .logo p{font-size:11px;color:var(--txt3);margin-top:4px}
@@ -29,7 +24,7 @@ body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background
 .nav-item svg{width:18px;height:18px;flex-shrink:0}
 .side-foot{padding:16px;border-top:1px solid var(--line);font-size:11px;color:var(--txt3)}
 .topbar-left h2{font-size:16px}
-.topbar-right{color:var(--txt2);font-size:13px}
+.topbar-right{color:var(--txt2);font-size:13px;display:flex;align-items:center;gap:12px}
 .today-pill{background:var(--bg3);padding:6px 14px;border-radius:20px}
 .card{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:20px}
 .card-title{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
@@ -51,9 +46,9 @@ label{display:block;font-size:12px;color:var(--txt2);margin-bottom:6px}
 .kpi-value{font-size:24px;font-weight:700}
 .kpi-value small{font-size:13px;color:var(--txt3);font-weight:400;margin-left:4px}
 .kpi-sub{font-size:11px;color:var(--txt3);margin-top:6px}
-.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;overflow:hidden}
-.charts-grid>*{min-width:0;overflow:hidden}
-.chart-box{height:320px;min-width:0;width:100%;overflow:hidden}
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.charts-grid>*{min-width:0}
+.chart-box{height:320px;min-width:0;width:100%}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{background:var(--bg3);padding:10px 12px;text-align:left;font-weight:600;color:var(--txt2);font-size:12px;white-space:nowrap}
 td{padding:8px 10px;border-bottom:1px solid var(--line)}
@@ -69,12 +64,12 @@ td{padding:8px 10px;border-bottom:1px solid var(--line)}
 .row-del{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:4px}
 .tip{background:rgba(59,130,246,.1);border-left:3px solid var(--blue);padding:10px 14px;border-radius:4px;font-size:12px;color:var(--txt2);margin-bottom:14px}
 .empty{text-align:center;padding:40px;color:var(--txt3)}
-.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:300}
 .modal-mask.show{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--line);border-radius:10px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:24px}
 .modal h3{margin-bottom:18px;font-size:16px}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-.toast{position:fixed;top:20px;right:20px;background:var(--green);color:#fff;padding:12px 20px;border-radius:6px;z-index:200;display:none;font-size:13px}
+.toast{position:fixed;top:20px;right:20px;background:var(--green);color:#fff;padding:12px 20px;border-radius:6px;z-index:400;display:none;font-size:13px}
 .toast.error{background:var(--red)}
 .sheet-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
 .paysheet th{position:sticky;top:0;z-index:2}
@@ -85,6 +80,9 @@ td{padding:8px 10px;border-bottom:1px solid var(--line)}
 .paysheet .sum-col{background:rgba(249,115,22,.08);font-weight:700;color:var(--accent)}
 .paysheet .total-col{background:rgba(16,185,129,.1);font-weight:700;color:var(--green)}
 .paysheet input.time-wage{width:90px;background:var(--bg);border:1px solid var(--yellow);color:var(--yellow);text-align:right;padding:4px 6px;font-size:12px;font-weight:600}
+.admin-only{display:none}
+body.role-admin .admin-only{display:block}
+body.role-admin .nav-item.admin-only{display:flex}
 @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}.entry-row{grid-template-columns:1fr 1fr}}
 @media print{.sidebar,.topbar,.side-foot,.no-print{display:none!important}.main{margin:0}body{background:#fff;color:#000}.card{border:1px solid #ccc}th{background:#eee!important;color:#000!important}}
 </style>
@@ -98,765 +96,975 @@ td{padding:8px 10px;border-bottom:1px solid var(--line)}
       <h1 style="font-size:20px;color:#f1f5f9;margin-bottom:6px">生产计件工资管理系统</h1>
       <p style="font-size:12px;color:#64748b">请登录后使用</p>
     </div>
-    <div id="loginForm">
-      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">用户名</label><input id="loginUser" placeholder="admin" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
-      <div style="margin-bottom:20px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">密码</label><input id="loginPass" type="password" placeholder="请输入密码" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
-      <button onclick="doLogin()" style="width:100%;background:#f97316;color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">登 录</button>
-      <p id="loginErr" style="color:#ef4444;font-size:12px;text-align:center;margin-top:12px;display:none">用户名或密码错误</p>
-    </div>
-    <div id="setupForm" style="display:none">
-      <p style="color:#facc15;font-size:13px;margin-bottom:16px;text-align:center">首次使用，请设置管理员密码</p>
-      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">设置用户名</label><input id="setupUser" value="admin" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
-      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">设置密码</label><input id="setupPass" type="password" placeholder="至少4位" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
-      <div style="margin-bottom:20px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">确认密码</label><input id="setupPass2" type="password" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
-      <button onclick="doSetup()" style="width:100%;background:#10b981;color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">完成设置并进入</button>
-    </div>
+    <form id="loginForm" onsubmit="return doLogin(event)">
+      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">用户名</label><input id="loginUser" placeholder="admin" autocomplete="username" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
+      <div style="margin-bottom:20px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">密码</label><input id="loginPass" type="password" placeholder="请输入密码" autocomplete="current-password" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
+      <button type="submit" id="loginBtn" style="width:100%;background:#f97316;color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">登 录</button>
+      <p id="loginErr" style="color:#ef4444;font-size:12px;text-align:center;margin-top:12px;display:none"></p>
+    </form>
   </div>
 </div>
-<div class="app">
+<div class="app" id="appRoot" style="display:none">
   <div class="sidebar">
-    <div class="logo"><h1>🏭 生产管理系统</h1><p>计件工资 · 仪表盘 v1.4</p></div>
+    <div class="logo"><h1>🏭 生产管理系统</h1><p>计件工资 · 云端版 v2.0</p></div>
     <div class="nav" id="nav">
       <div class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>生产仪表盘</div>
       <div class="nav-item" data-view="entry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>生产录入</div>
       <div class="nav-item" data-view="records"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>生产记录</div>
-      <div class="nav-item" data-view="payroll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>工资汇总</div>
-      <div class="nav-item" data-view="paysheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/></svg>工资表</div>
+      <div class="nav-item admin-only" data-view="payroll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/></svg>工资汇总</div>
+      <div class="nav-item admin-only" data-view="paysheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/></svg>工资表</div>
       <div class="nav-item" data-view="materials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>物料用量</div>
       <div class="nav-item" data-view="employees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>员工管理</div>
       <div class="nav-item" data-view="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>产品工价</div>
     </div>
     <div class="side-foot">
-      <button class="btn secondary sm" style="width:100%;margin-bottom:8px" onclick="exportData()">导出备份</button>
-      <button class="btn secondary sm" style="width:100%;margin-bottom:8px" onclick="document.getElementById('importFile').click()">导入备份</button>
-      <button class="btn danger sm" style="width:100%;margin-bottom:8px" onclick="clearAllData()">清空所有数据</button>
+      <button class="btn secondary sm admin-only" style="width:100%;margin-bottom:8px" onclick="exportData()">导出备份</button>
+      <button class="btn secondary sm admin-only" style="width:100%;margin-bottom:8px" onclick="document.getElementById('importFile').click()">导入备份</button>
+      <button class="btn danger sm admin-only" style="width:100%;margin-bottom:8px" onclick="clearAllData()">清空所有数据</button>
       <button class="btn secondary sm" style="width:100%;margin-bottom:8px" onclick="changePwd()">修改密码</button>
       <button class="btn secondary sm" style="width:100%" onclick="logout()">退出登录</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     </div>
   </div>
   <div class="main">
-    <div class="topbar"><div class="topbar-left"><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px;margin-right:10px"></span><span class="today-pill" id="todayPill"></span></div></div></div>
+    <div class="topbar"><div class="topbar-left"><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px"></span><span class="today-pill" id="todayPill"></span></div></div>
     <div class="content" id="content"></div>
   </div>
 </div>
 <div class="modal-mask" id="modalMask"><div class="modal" id="modalBox"></div></div>
 <div class="toast" id="toast"></div>
 <script>
-const LS_KEY='production_mgmt_v1';
-const AUTH_KEY='production_mgmt_auth_v1';
-// ==== 云端配置 ====
-const CLOUD = {
-  url: 'https://eboongrwkmsysbztyxgm.supabase.co',
-  key: 'sb_publishable_EJUPSm5-kzQ0p7Kl1N3gFw_te8P3V-S',
-  table: 'app_data'
-};
-const useCloud = () => CLOUD.url && CLOUD.key;
-// 登录账号（所有人共用，修改下方两处即可改密码）
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = '123456';
-// ==== 登录（密码硬编码，所有人共用）====
-function getAuth(){return {u:ADMIN_USER,p:ADMIN_PASS}}
-function doSetup(){
-  $('#loginPage').style.display='none';
+/* ===== CDN 双源加载（jsDelivr 故障自动切换 cdnjs）===== */
+const LIBS=[
+ {js:'@supabase/supabase-js@2.45.4/dist/umd/supabase.js', cdnjs:'supabase-js/2.45.4/supabase.js', check:()=>window.supabase},
+ {js:'echarts@5.4.3/dist/echarts.min.js', cdnjs:'echarts/5.4.3/echarts.min.js', check:()=>window.echarts},
+ {js:'exceljs@4.4.0/dist/exceljs.min.js', cdnjs:'exceljs/4.4.0/exceljs.min.js', check:()=>window.ExcelJS}
+];
+function loadSrc(src){return new Promise((res,rej)=>{var s=document.createElement('script');s.src=src;s.async=true;s.onload=res;s.onerror=()=>rej(new Error('fail '+src));document.head.appendChild(s)})}
+async function loadAll(){
+ for(const L of LIBS){
+   if(L.check())continue;
+   try{await loadSrc('https://cdn.jsdelivr.net/npm/'+L.js)}
+   catch(e){await loadSrc('https://cdnjs.cloudflare.com/ajax/libs/'+L.cdnjs)}
+ }
+ boot();
 }
-function doLogin(){
-  const u=$('#loginUser').value.trim(),p=$('#loginPass').value;
-  if(u===ADMIN_USER&&p===ADMIN_PASS){
-    $('#loginPage').style.display='none';
-    toast('欢迎回来，'+u);
-    if(typeof loadFromCloud==='function')loadFromCloud();
-  }else{
-    $('#loginErr').style.display='block';
-    $('#loginPass').value='';
-    $('#loginPass').focus();
-  }
-}
-function logout(){
-  $('#loginPage').style.display='flex';
-  $('#loginForm').style.display='block';
-}
-function changePwd(){
-  alert('请联系管理员修改密码');
-}
-// 初始化登录页：直接显示登录表单
-$('#setupForm').style.display='none';
-$('#loginForm').style.display='block';
+/* ===== APP SCRIPT ===== */
+/* ---- 云端配置 ---- */
+const SB_URL='https://eboongrwkmsysbztyxgm.supabase.co';
+const SB_KEY='sb_publishable_EJUPSm5-kzQ0p7Kl1N3gFw_te8P3V-S';
+const EMAIL_DOMAIN='@jiayu.factory';
+let sb=null;
+let me=null,isAdmin=false,dataReady=false;
 let DB={employees:[],products:[],records:[],materials:[],timeWages:{}};
-function seedData(){
-  const today=new Date(),fmt=d=>d.toISOString().slice(0,10);
-  DB.employees=[{id:'E001',name:'张伟',team:'一班',role:'高频工'},{id:'E002',name:'王芳',team:'一班',role:'缝纫工'},{id:'E003',name:'李强',team:'一班',role:'缝纫工'},{id:'E004',name:'赵敏',team:'二班',role:'高频工'},{id:'E005',name:'陈杰',team:'二班',role:'装订工'},{id:'E006',name:'刘洋',team:'二班',role:'包装工'},{id:'E007',name:'杨梅',team:'一班',role:'检测工'},{id:'E008',name:'黄涛',team:'二班',role:'高频工'},{id:'E009',name:'周静',team:'一班',role:'包装工'},{id:'E010',name:'吴磊',team:'二班',role:'检测工'}];
-  DB.products=[['SF-001 充气沙发','标准款','高频焊接',1.20],['SF-001 充气沙发','标准款','贴角安装',0.60],['SF-001 充气沙发','标准款','气嘴安装',0.30],['SF-001 充气沙发','标准款','成品检测',0.25],['SF-001 充气沙发','标准款','包装入库',0.40],['SF-001 充气沙发','加大款','高频焊接',1.50],['SF-001 充气沙发','加大款','贴角安装',0.80],['SF-001 充气沙发','加大款','气嘴安装',0.30],['SF-001 充气沙发','加大款','成品检测',0.30],['SF-001 充气沙发','加大款','包装入库',0.50],['PO-002 儿童游泳池','圆形款','裁剪下料',0.40],['PO-002 儿童游泳池','圆形款','高频焊接',0.90],['PO-002 儿童游泳池','圆形款','气嘴安装',0.25],['PO-002 儿童游泳池','圆形款','成品检测',0.20],['PO-002 儿童游泳池','圆形款','包装入库',0.35],['PO-002 儿童游泳池','方形款','裁剪下料',0.50],['PO-002 儿童游泳池','方形款','高频焊接',1.10],['PO-002 儿童游泳池','方形款','气嘴安装',0.25],['PO-002 儿童游泳池','方形款','成品检测',0.25],['PO-002 儿童游泳池','方形款','包装入库',0.40],['MT-003 充气床垫','单人款','裁剪下料',0.35],['MT-003 充气床垫','单人款','高频焊接',0.80],['MT-003 充气床垫','单人款','贴带加固',0.45],['MT-003 充气床垫','单人款','成品检测',0.20],['MT-003 充气床垫','单人款','包装入库',0.30],['MT-003 充气床垫','双人款','裁剪下料',0.45],['MT-003 充气床垫','双人款','高频焊接',1.00],['MT-003 充气床垫','双人款','贴带加固',0.60],['MT-003 充气床垫','双人款','成品检测',0.25],['MT-003 充气床垫','双人款','包装入库',0.40]].map((p,i)=>({id:i+1,model:p[0],style:p[1],process:p[2],price:p[3]}));
-  const samples=[['E001','SF-001 充气沙发','标准款','高频焊接',120,3],['E001','SF-001 充气沙发','加大款','高频焊接',80,2],['E002','SF-001 充气沙发','标准款','贴角安装',200,5],['E003','MT-003 充气床垫','单人款','高频焊接',150,4],['E004','PO-002 儿童游泳池','圆形款','高频焊接',100,3],['E005','PO-002 儿童游泳池','方形款','气嘴安装',250,6],['E006','SF-001 充气沙发','标准款','包装入库',180,2],['E007','MT-003 充气床垫','单人款','成品检测',300,8],['E008','SF-001 充气沙发','加大款','高频焊接',90,3],['E009','PO-002 儿童游泳池','圆形款','包装入库',220,3],['E010','MT-003 充气床垫','双人款','成品检测',160,5]];
-  let rid=1;
-  for(let d=6;d>=0;d--){const day=new Date(today);day.setDate(day.getDate()-d);samples.forEach(s=>DB.records.push({id:rid++,date:fmt(day),empId:s[0],model:s[1],style:s[2],process:s[3],qtyGood:s[4],qtyBad:s[5],note:''}));}
-}
-// ==== 云端工具 ====
 
-function tsNow(){return new Date().toISOString()}
-function setCloud(t){const el=document.getElementById('cloudStatus');if(el)el.textContent=t}
-function modalOpen(){return $('#modalMask').classList.contains('show')}
-/* 读取云端整行 */
-async function cloudGet(){
-  const r=await fetch(`${CLOUD.url}/rest/v1/${CLOUD.table}?key=eq.main&select=data,updated_at`,{
-    headers:{apikey:CLOUD.key,Authorization:`Bearer ${CLOUD.key}`}});
-  const rows=await r.json();
-  if(rows&&rows.length)return{data:rows[0].data,rev:rows[0].updated_at};
-  return{data:null,rev:null};
-}
-/* 条件更新：仅当云端 updated_at 仍等于 rev（乐观锁，防并发覆盖），返回更新行，空数组=冲突 */
-async function cloudPush(data,rev){
-  const url=rev
-    ?`${CLOUD.url}/rest/v1/${CLOUD.table}?key=eq.main&updated_at=eq.${encodeURIComponent(rev)}`
-    :`${CLOUD.url}/rest/v1/${CLOUD.table}?key=eq.main`;
-  const r=await fetch(url,{method:'PATCH',
-    headers:{apikey:CLOUD.key,Authorization:`Bearer ${CLOUD.key}`,'Content-Type':'application/json'},
-    body:JSON.stringify({data,updated_at:tsNow()})});
-  const txt=await r.text();let rows=[];try{rows=txt?JSON.parse(txt):[]}catch(e){}
-  return rows;
-}
-/* 首次插入整行 */
-async function cloudInsert(data){
-  await fetch(`${CLOUD.url}/rest/v1/${CLOUD.table}`,{method:'POST',
-    headers:{apikey:CLOUD.key,Authorization:`Bearer ${CLOUD.key}`,'Content-Type':'application/json',Prefer:'return=minimal'},
-    body:JSON.stringify({key:'main',data,updated_at:tsNow()})});
-}
-/* 智能合并两份数据：新增取并集，修改按 updated_at 新者为准，删除按墓碑同步 */
-function mergeDB(L,C){
-  L=L||{};C=C||{};const out={};
-  const arrs=['employees','products','records','materials'];
-  arrs.forEach(k=>{
-    const map=new Map();
-    (C[k]||[]).forEach(x=>map.set(String(x.id),x));
-    (L[k]||[]).forEach(x=>{
-      const key=String(x.id),ex=map.get(key);
-      if(!ex){map.set(key,x)}else{
-        const lt=x.updated_at?Date.parse(x.updated_at):0,ct=ex.updated_at?Date.parse(ex.updated_at):0;
-        if(lt>=ct)map.set(key,x);
-      }
-    });
-    out[k]=[...map.values()];
-  });
-  // 计时工资：按 _timeMeta 时间戳决定新值
-  const tw={},twm={},Lm=L._timeMeta||{},Cm=C._timeMeta||{};
-  const keys=new Set([...Object.keys(L.timeWages||{}),...Object.keys(C.timeWages||{})]);
-  keys.forEach(key=>{
-    const lv=(L.timeWages||{})[key],cv=(C.timeWages||{})[key];
-    const lt=Lm[key]?Date.parse(Lm[key]):0,ct=Cm[key]?Date.parse(Cm[key]):0;
-    if(lv===undefined){tw[key]=cv;if(Cm[key])twm[key]=Cm[key]}
-    else if(cv===undefined){tw[key]=lv;if(Lm[key])twm[key]=Lm[key]}
-    else if(lt>=ct){tw[key]=lv;if(Lm[key])twm[key]=Lm[key]}
-    else{tw[key]=cv;if(Cm[key])twm[key]=Cm[key]}
-  });
-  out.timeWages=tw;out._timeMeta=twm;
-  // 墓碑（删除清单）合并，清理30天前
-  const tomb={};
-  Object.entries(L._tomb||{}).forEach(([id,t])=>tomb[id]=t);
-  Object.entries(C._tomb||{}).forEach(([id,t])=>{if(!tomb[id]||Date.parse(t)>Date.parse(tomb[id]))tomb[id]=t});
-  const cutoff=Date.now()-30*86400000;
-  Object.keys(tomb).forEach(id=>{if(Date.parse(tomb[id])<cutoff)delete tomb[id]});
-  out._tomb=tomb;
-  arrs.forEach(k=>{out[k]=out[k].filter(x=>!tomb[k+':'+String(x.id)])});
-  return out;
-}
-function markDeleted(kind,id){DB._tomb=DB._tomb||{};DB._tomb[kind+':'+String(id)]=tsNow()}
-let idSeq=0;
-function nextId(){
-  if(!idSeq){
-    idSeq=Math.max(Date.now(),
-      ...DB.records.map(x=>Number(x.id)||0),
-      ...DB.products.map(x=>Number(x.id)||0),
-      ...DB.materials.map(x=>Number(x.id)||0));
-  }
-  return ++idSeq;
-}
-/* 无条件强制覆盖云端（用于"清空所有数据"，绕过合并） */
-async function forceReplaceCloud(data){
-  const r=await fetch(`${CLOUD.url}/rest/v1/${CLOUD.table}?key=eq.main`,{method:'PATCH',
-    headers:{apikey:CLOUD.key,Authorization:`Bearer ${CLOUD.key}`,'Content-Type':'application/json',Prefer:'return=minimal'},
-    body:JSON.stringify({data,updated_at:tsNow()})});
-  if(r.status===404)await cloudInsert(data);
-}
-let isDirty=false,syncTimer=null;
-function load(){
-  const raw=localStorage.getItem(LS_KEY);
-  if(raw){try{DB=JSON.parse(raw);DB.timeWages=DB.timeWages||{}}catch(e){DB={employees:[],products:[],records:[],materials:[],timeWages:{}}}}
-  if(useCloud()){
-    cloudGet().then(({data})=>{
-      if(data){
-        DB=mergeDB(DB,Object.assign({employees:[],products:[],records:[],materials:[],timeWages:{}},data));
-        localStorage.setItem(LS_KEY,JSON.stringify(DB));render();
-        setCloud('☁️ 已连接云端 · '+new Date().toLocaleTimeString());
-      }else{setCloud('☁️ 云端暂无数据')}
-      startSync();
-    }).catch(e=>{setCloud('⚠️ 云端连接失败，使用本地数据');startSync()});
-  }
-}
-/* 保存：读云端→合并→乐观锁写回，冲突自动重试3次，杜绝多人覆盖 */
-async function save(){
-  localStorage.setItem(LS_KEY,JSON.stringify(DB));
-  if(!useCloud())return;
-  isDirty=true;
-  try{
-    let pushed=false;
-    for(let attempt=0;attempt<3&&!pushed;attempt++){
-      const {data:cloud,rev}=await cloudGet();
-      DB=cloud?mergeDB(DB,cloud):DB;
-      localStorage.setItem(LS_KEY,JSON.stringify(DB));
-      if(!cloud){await cloudInsert(DB);pushed=true;break}
-      const rows=await cloudPush(DB,rev);
-      if(rows.length>=1)pushed=true;
-    }
-    if(pushed){isDirty=false;setCloud('☁️ 已同步 · '+new Date().toLocaleTimeString())}
-    else setCloud('⚠️ 同步冲突，将自动重试');
-  }catch(e){setCloud('⚠️ 同步失败，已存本地，将自动重试')}
-}
-/* 定时同步：有未保存数据则走保存，否则只拉取；每30秒 */
-async function pullOnly(){
-  if(!useCloud())return;
-  try{
-    const {data:cloud}=await cloudGet();
-    if(cloud){
-      DB=mergeDB(DB,cloud);
-      localStorage.setItem(LS_KEY,JSON.stringify(DB));
-      if(curView!=='entry'&&!modalOpen())render();
-      setCloud('☁️ 已连接云端 · '+new Date().toLocaleTimeString());
-    }
-  }catch(e){}
-}
-function startSync(){
-  if(syncTimer||!useCloud())return;
-  syncTimer=setInterval(()=>{if(isDirty)save();else pullOnly();},30000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden){isDirty?save():pullOnly()}});
-}
-function $(s,p=document){return p.querySelector(s)}
-function $$(s,p=document){return[...p.querySelectorAll(s)]}
-function today(){return new Date().toISOString().slice(0,10)}
-function empName(id){const e=DB.employees.find(e=>e.id===id);return e?e.name:id}
-function empTeam(id){const e=DB.employees.find(e=>e.id===id);return e?e.team:''}
-function priceOf(m,s,p){const x=DB.products.find(x=>x.model===m&&x.style===s&&x.process===p);return x?x.price:0}
-function wageOf(r){if(r.wage!==undefined)return r.wage;return(r.qtyGood||0)*priceOf(r.model,r.style,r.process)}
-function fmtMoney(n){return'¥'+(+n||0).toFixed(2)}
-function fmtPrice(n){n=+n||0;let s=n.toFixed(4).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');return'¥'+s}
-function toast(msg,err=false){const t=$('#toast');t.textContent=msg;t.className='toast'+(err?' error':'');t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
+/* ---- DOM 工具 ---- */
+const $=(s,el)=>(el||document).querySelector(s);
+const $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+/* XSS 防护：所有用户可控内容渲染前转义 */
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+/* ---- 本地时区日期（修复 UTC 错一天 bug）---- */
+const pad2=n=>String(n).padStart(2,'0');
+function today(){const d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+function localDateStr(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return localDateStr(d)}
+function monthStart(s){return s.slice(0,7)+'-01'}
+function monthEnd(s){const y=+s.slice(0,4),m=+s.slice(5,7);return s.slice(0,7)+'-'+pad2(new Date(y,m,0).getDate())}
+
+/* ---- 工资/工价（工价精确不四舍五入，仅金额显示两位）---- */
+function priceOf(model,style,process){const p=DB.products.find(x=>x.model===model&&x.style===style&&x.process===process);return p?p.price:0}
+function wageOf(r){return (r.qtyGood||0)*priceOf(r.model,r.style,r.process)}
+function fmtMoney(n){return Number(n).toFixed(2)}
+function fmtPrice(n){return String(Number(n))}
+function empName(id){const e=DB.employees.find(x=>x.id===id);return e?e.name:id}
+
+/* ---- 提示 / 弹窗 ---- */
+let toastTimer;
+function toast(msg,isErr){const t=$('#toast');t.textContent=msg;t.className=isErr?'toast error':'toast';t.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.display='none',2200)}
 function modal(html){$('#modalBox').innerHTML=html;$('#modalMask').classList.add('show')}
 function closeModal(){$('#modalMask').classList.remove('show')}
+function modalOpen(){return $('#modalMask').classList.contains('show')}
 $('#modalMask').addEventListener('click',e=>{if(e.target.id==='modalMask')closeModal()});
-function exportData(){const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='生产数据备份_'+today()+'.json';a.click();toast('已导出备份')}
-async function clearAllData(){if(!confirm('⚠️ 确定清空所有数据？\n\n将删除全部：生产记录、员工、产品工价、物料、计时工资。\n建议先点「导出备份」保存当前数据。\n\n此操作不可恢复！'))return;if(!confirm('再次确认：真的要清空吗？'))return;DB={employees:[],products:[],records:[],materials:[],timeWages:{},_timeMeta:{},_tomb:{}};localStorage.setItem(LS_KEY,JSON.stringify(DB));if(useCloud()){await forceReplaceCloud(DB)}render();toast('已清空，请重新导入或添加基础数据')}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const parsed=JSON.parse(r.result);parsed.timeWages=parsed.timeWages||{};DB=parsed;localStorage.setItem(LS_KEY,JSON.stringify(DB));if(useCloud()){if(confirm('导入方式：\n\n【确定】完全替换：云端及所有人的数据都变成这份（适合恢复备份）\n【取消】合并：保留云端已有数据，只增补新内容')){await forceReplaceCloud(DB)}else{await save()}}render();toast('导入成功')}catch(_){toast('文件格式错误',true)}};r.readAsText(f);e.target.value=''}
-const TITLES={dashboard:'生产仪表盘',entry:'生产录入',records:'生产记录',payroll:'工资汇总',paysheet:'当月工资表',materials:'物料用量',employees:'员工管理',products:'产品工价'};
-let curView='dashboard',charts={};
-function navigate(view){curView=view;$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===view));$('#viewTitle').textContent=TITLES[view];Object.values(charts).forEach(c=>{try{c.dispose()}catch(_){}});charts={};render()}
-$('.nav').addEventListener('click',e=>{const it=e.target.closest('.nav-item');if(it)navigate(it.dataset.view)});
-function render(){const c=$('#content');({dashboard:renderDashboard,entry:renderEntry,records:renderRecords,payroll:renderPayroll,paysheet:renderPaysheet,materials:renderMaterials,employees:renderEmployees,products:renderProducts})[curView](c)}
 
-/* ==== 仪表盘 ==== */
-let dashDate=today();
-function renderDashboard(c){
-  // 先销毁旧图表实例，避免重复init冲突
-  if(charts.trend){try{charts.trend.dispose()}catch(e){}charts.trend=null}
-  if(charts.rank){try{charts.rank.dispose()}catch(e){}charts.rank=null}
-  if(charts.pie){try{charts.pie.dispose()}catch(e){}charts.pie=null}
-  if(charts.month){try{charts.month.dispose()}catch(e){}charts.month=null}
-  c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><label style="margin:0;color:var(--txt2)">查看日期：</label><input type="date" id="dashDate" value="${dashDate}" onchange="dashDate=this.value;render()"><button class="btn sm secondary" onclick="dashDate=today();render()">回到今天</button><span style="color:var(--txt3);font-size:12px;flex:1">当前查看：${dashDate}（选任意一天，KPI和图表自动切换）</span></div>`;
-  const t=dashDate,ms=new Date(t);ms.setDate(1);const msStr=ms.toISOString().slice(0,10);
-  const yd=new Date(t);yd.setDate(yd.getDate()-1);const ydStr=yd.toISOString().slice(0,10);
-  const dayR=DB.records.filter(r=>r.date===t);
-  const ydR=DB.records.filter(r=>r.date===ydStr);
-  const monthR=DB.records.filter(r=>r.date>=msStr&&r.date<=t);
-  const dq=dayR.reduce((s,r)=>s+(r.qtyGood||0),0),dw=dayR.reduce((s,r)=>s+wageOf(r),0),de=new Set(dayR.map(r=>r.empId)).size;
-  const ydq=ydR.reduce((s,r)=>s+(r.qtyGood||0),0),ydw=ydR.reduce((s,r)=>s+wageOf(r),0),yde=new Set(ydR.map(r=>r.empId)).size;
-  const cmp=(a,b)=>b===0?(a>0?'新增':'-'):((a-b)/b*100).toFixed(1)+'%';
-  const mq=monthR.reduce((s,r)=>s+(r.qtyGood||0),0),mw=monthR.reduce((s,r)=>s+wageOf(r),0),mg=monthR.reduce((s,r)=>s+(r.qtyGood||0),0),mb=monthR.reduce((s,r)=>s+(r.qtyBad||0),0),mr=mg+mb>0?mg/(mg+mb):0;
-  c.innerHTML+=`<div class="kpi-grid">
-    <div class="kpi"><div class="kpi-label">当日总产量</div><div class="kpi-value">${dq}<small>件</small></div><div class="kpi-sub">${dayR.length}条 · 较昨日${cmp(dq,ydq)}</div></div>
-    <div class="kpi blue"><div class="kpi-label">当日工资总额</div><div class="kpi-value">${dw.toFixed(2)}<small>元</small></div><div class="kpi-sub">${de}人在产 · 较昨日${cmp(dw,ydw)}</div></div>
-    <div class="kpi yellow"><div class="kpi-label">本月累计产量</div><div class="kpi-value">${mq}<small>件</small></div><div class="kpi-sub">自 ${msStr}</div></div>
-    <div class="kpi green"><div class="kpi-label">本月累计工资</div><div class="kpi-value">${mw.toFixed(2)}<small>元</small></div><div class="kpi-sub">全厂累计</div></div>
-    <div class="kpi"><div class="kpi-label">本月良品率</div><div class="kpi-value">${(mr*100).toFixed(1)}<small>%</small></div><div class="kpi-sub">不良 ${mb} 件</div></div>
-    <div class="kpi blue"><div class="kpi-label">员工总数</div><div class="kpi-value">${DB.employees.length}<small>人</small></div><div class="kpi-sub">${DB.products.length} 道工序</div></div></div>
-  <div class="charts-grid"><div class="card"><div class="card-title">近7日产量与工资趋势（以 ${t} 为今日）</div><div class="chart-box" id="chartTrend"></div></div><div class="card"><div class="card-title">当日员工工资排行（${t}）</div><div class="chart-box" id="chartRank"></div></div></div>
-  <div class="charts-grid"><div class="card"><div class="card-title">产品产量占比（${t} 当日）</div><div class="chart-box" id="chartPie"></div></div><div class="card"><div class="card-title">各工序当日不良预警（${t}）</div><div id="qcBox" style="max-height:320px;overflow-y:auto"></div></div></div>
-  <div class="charts-grid" style="grid-template-columns:1fr"><div class="card"><div class="card-title">月度每日工资趋势（${t.slice(0,7)}）</div><div class="chart-box" id="chartMonth"></div></div></div>`;
-  const emptyOpt={title:{text:'当日无生产记录',left:'center',top:'center',textStyle:{color:'#64748b',fontSize:14}},xAxis:{show:false},yAxis:{show:false},series:[]};
-  const days=[];for(let i=6;i>=0;i--){const d=new Date(t);d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10))}
-  // 月度每日工资趋势
-  const ym2=t.slice(0,7);
-  const daysInMonth=new Date(+ym2.slice(0,4),+ym2.slice(5,7),0).getDate();
-  const monthWages=[];
-  for(let d=1;d<=daysInMonth;d++){
-    const ds=ym2+'-'+String(d).padStart(2,'0');
-    monthWages.push(monthR.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0));
-  }
-  // 所有图表延迟初始化，确保DOM渲染完成
-  const ew=DB.employees.map(e=>({name:e.name,wage:dayR.filter(r=>r.empId===e.id).reduce((s,r)=>s+wageOf(r),0)})).filter(e=>e.wage>0).sort((a,b)=>b.wage-a.wage);
-  const dm=[...new Set(dayR.map(r=>r.model))];
-  requestAnimationFrame(()=>{
-    charts.trend=echarts.init($('#chartTrend'));
-    charts.trend.setOption({tooltip:{trigger:'axis'},legend:{data:['产量','工资(元)'],textStyle:{color:'#94a3b8'}},grid:{left:50,right:50,top:40,bottom:30},xAxis:{type:'category',data:days.map(d=>d.slice(5)),axisLabel:{color:'#94a3b8'},axisLine:{lineStyle:{color:'#334155'}}},yAxis:[{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{show:false}}],series:[{name:'产量',type:'bar',data:days.map(d=>DB.records.filter(r=>r.date===d).reduce((s,r)=>s+(r.qtyGood||0),0)),itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},{name:'工资(元)',type:'line',yAxisIndex:1,data:days.map(d=>DB.records.filter(r=>r.date===d).reduce((s,r)=>s+wageOf(r),0)),smooth:true,itemStyle:{color:'#f97316'},lineStyle:{width:3}}]});
-    charts.rank=echarts.init($('#chartRank'));
-    if(ew.length){
-      charts.rank.setOption({tooltip:{trigger:'axis'},grid:{left:60,right:60,top:20,bottom:20},xAxis:{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},yAxis:{type:'category',data:ew.map(e=>e.name).reverse(),axisLabel:{color:'#94a3b8'}},series:[{type:'bar',data:ew.map(e=>e.wage).reverse(),itemStyle:{color:'#f97316',borderRadius:[0,4,4,0]},label:{show:true,position:'right',color:'#94a3b8',formatter:'¥{c}'}}]});
-    }else{charts.rank.setOption(emptyOpt)}
-    charts.pie=echarts.init($('#chartPie'));
-    if(dm.length){
-      charts.pie.setOption({tooltip:{trigger:'item',formatter:'{b}: {c}件 ({d}%)'},legend:{bottom:0,textStyle:{color:'#94a3b8',fontSize:11}},series:[{type:'pie',radius:['40%','65%'],center:['50%','45%'],data:dm.map(m=>({name:m,value:dayR.filter(r=>r.model===m).reduce((s,r)=>s+(r.qtyGood||0),0)})),label:{color:'#94a3b8'},itemStyle:{borderColor:'#1e293b',borderWidth:2}}]});
-    }else{charts.pie.setOption(emptyOpt)}
-    charts.month=echarts.init($('#chartMonth'));
-    charts.month.setOption({tooltip:{trigger:'axis'},grid:{left:60,right:30,top:30,bottom:30},xAxis:{type:'category',data:Array.from({length:daysInMonth},(_,i)=>i+1+'日'),axisLabel:{color:'#94a3b8'},axisLine:{lineStyle:{color:'#334155'}}},yAxis:{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},series:[{type:'bar',data:monthWages,itemStyle:{color:'#10b981',borderRadius:[4,4,0,0]}}]});
-    // 触发resize
-    [charts.trend,charts.rank,charts.pie,charts.month].forEach(ch=>{if(ch)try{ch.resize()}catch(e){}});
-  });
+/* ---- 审计日志（不可篡改）---- */
+async function audit(action,target,detail){
+ try{await sb.from('audit_log').insert({actor:me?me.id:null,actor_name:me?me.userName:'',action,target,detail:detail||null})}catch(e){}
 }
 
-/* ==== 生产录入 ==== */
+/* ---- 认证（真实账号，服务端校验，无法绕过）---- */
+function loginEmail(u){u=u.trim();return u.includes('@')?u:u+EMAIL_DOMAIN}
+function roleOf(user){return(user.app_metadata&&user.app_metadata.role)||''}
+function showLoginErr(m){const el=$('#loginErr');el.textContent=m;el.style.display='block';$('#loginPass').value='';$('#loginPass').focus()}
+async function doLogin(e){
+ if(e)e.preventDefault();
+ const u=$('#loginUser').value.trim(),p=$('#loginPass').value;
+ if(!u||!p){showLoginErr('请输入用户名和密码');return false}
+ const btn=$('#loginBtn');btn.disabled=true;btn.textContent='登录中...';
+ const {data,error}=await sb.auth.signInWithPassword({email:loginEmail(u),password:p});
+ btn.disabled=false;btn.textContent='登 录';
+ if(error){showLoginErr('用户名或密码错误');return false}
+ await afterAuth(data.session);
+ return false;
+}
+async function logout(){await sb.auth.signOut()}
+function changePwd(){
+ modal(`<h3>修改密码</h3>
+  <div class="form-row"><label>当前密码</label><input type="password" id="cpOld" autocomplete="current-password"></div>
+  <div class="form-row"><label>新密码（至少6位）</label><input type="password" id="cpNew" autocomplete="new-password"></div>
+  <div class="form-row"><label>确认新密码</label><input type="password" id="cpNew2" autocomplete="new-password"></div>
+  <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="doChangePwd()">确认修改</button></div>`);
+}
+async function doChangePwd(){
+ const o=$('#cpOld').value,n=$('#cpNew').value,n2=$('#cpNew2').value;
+ if(!o||!n){toast('请填写完整',true);return}
+ if(n.length<6){toast('新密码至少6位',true);return}
+ if(n!==n2){toast('两次新密码不一致',true);return}
+ const {error:ve}=await sb.auth.signInWithPassword({email:me.email,password:o});
+ if(ve){toast('当前密码错误',true);return}
+ const {error}=await sb.auth.updateUser({password:n});
+ if(error){toast('修改失败',true);return}
+ audit('修改密码',me.userName,null);closeModal();toast('密码已修改');
+}
+
+/* ---- 行映射 ---- */
+const mapEmployee=x=>({id:x.id,name:x.name,team:x.team,role:x.role||'',active:x.active});
+const mapProduct=x=>({id:x.id,model:x.model,style:x.style,process:x.process,price:Number(x.price)});
+const mapRecord=x=>({id:x.id,date:x.work_date,empId:x.emp_id,model:x.model,style:x.style,process:x.process,qtyGood:x.qty_good,qtyBad:x.qty_bad,note:x.note||'',createdBy:x.created_by});
+const mapMaterial=x=>({id:x.id,date:x.work_date,name:x.name,spec:x.spec||'',unit:x.unit||'',qty:Number(x.qty),price:Number(x.price),person:x.person||'',note:x.note||''});
+
+/* ---- 数据加载（按表，一次到位）---- */
+function setCloud(t){const el=$('#cloudStatus');if(el)el.textContent=t}
+async function loadAllData(){
+ setCloud('☁️ 数据加载中...');
+ const [em,pr,re,tw,ma]=await Promise.all([
+  sb.from('employees').select('*').order('id'),
+  sb.from('products').select('*').order('id'),
+  sb.from('records').select('*').order('id'),
+  sb.from('time_wages').select('*'),
+  sb.from('materials').select('*').order('id')
+ ]);
+ if(em.error)throw em.error;if(pr.error)throw pr.error;if(re.error)throw re.error;
+ DB.employees=em.data.map(mapEmployee);
+ DB.products=pr.data.map(mapProduct);
+ DB.records=re.data.map(mapRecord);
+ DB.materials=ma.data.map(mapMaterial);
+ DB.timeWages={};tw.data.forEach(x=>DB.timeWages[x.id]=Number(x.amount));
+ dataReady=true;setCloud('☁️ 已连接 · 实时同步');
+}
+
+/* ---- 行级 CRUD ---- */
+async function createRecord(o){
+ const {data,error}=await sb.from('records').insert({work_date:o.date,emp_id:o.empId,model:o.model,style:o.style,process:o.process,qty_good:o.qtyGood,qty_bad:o.qtyBad,note:o.note}).select('*').single();
+ if(error)throw error;return mapRecord(data);
+}
+async function updateRecord(id,o){
+ const {data,error}=await sb.from('records').update({work_date:o.date,emp_id:o.empId,model:o.model,style:o.style,process:o.process,qty_good:o.qtyGood,qty_bad:o.qtyBad,note:o.note}).eq('id',id).select('*').single();
+ if(error)throw error;return mapRecord(data);
+}
+async function deleteRecord(id){const {error}=await sb.from('records').delete().eq('id',id);if(error)throw error}
+
+/* ---- 实时同步：任何人增改，所有客户端即时刷新 ---- */
+function upsert(arr,o){const i=arr.findIndex(x=>x.id===o.id);if(i>=0)arr[i]=o;else arr.push(o)}
+function onRowChange(kind,p){
+ try{
+  if(kind==='records'){
+   if(p.eventType==='DELETE')DB.records=DB.records.filter(x=>x.id!==p.old.id);
+   else upsert(DB.records,mapRecord(p.new));
+  }else if(kind==='employees'){
+   if(p.eventType==='DELETE')DB.employees=DB.employees.filter(x=>x.id!==p.old.id);
+   else upsert(DB.employees,mapEmployee(p.new));
+  }else if(kind==='products'){
+   if(p.eventType==='DELETE')DB.products=DB.products.filter(x=>x.id!==p.old.id);
+   else upsert(DB.products,mapProduct(p.new));
+  }else if(kind==='materials'){
+   if(p.eventType==='DELETE')DB.materials=DB.materials.filter(x=>x.id!==p.old.id);
+   else upsert(DB.materials,mapMaterial(p.new));
+  }else if(kind==='time_wages'){
+   if(p.eventType==='DELETE')delete DB.timeWages[p.old.id];else DB.timeWages[p.new.id]=Number(p.new.amount);
+  }
+ }catch(e){}
+ safeRender();
+}
+function subscribeRealtime(){
+ const ch=sb.channel('db-changes');
+ ['records','employees','products','materials','time_wages'].forEach(t=>
+  ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>onRowChange(t,p)));
+ ch.subscribe();
+}
+/* 录入页/弹窗打开时不打断输入，其余视图实时刷新 */
+function safeRender(){if(curView==='entry'||modalOpen())return;render()}
+
+/* ---- 启动 ---- */
+let curView='dashboard';
+async function afterAuth(session){
+ const user=session.user;
+ me={id:user.id,email:user.email,userName:user.email.split('@')[0]};
+ isAdmin=roleOf(user)==='admin';
+ document.body.classList.toggle('role-admin',isAdmin);
+ $('#loginPage').style.display='none';$('#appRoot').style.display='block';
+ try{
+  if(!dataReady)await loadAllData();
+  subscribeRealtime();
+  $('#todayPill').textContent='今天：'+today();
+  navigate('dashboard');
+  audit('登录',me.userName,null);
+ }catch(e){toast('数据加载失败：'+e.message,true)}
+}
+async function boot(){
+ sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefresh:true,detectSessionInUrl:false}});
+ const {data:{session}}=await sb.auth.getSession();
+ sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_OUT')location.reload()});
+ if(session)await afterAuth(session);
+ else{$('#loginPage').style.display='flex';$('#loginUser').focus()}
+}
+/* ===== VIEWS ===== */
+const TITLES={dashboard:'生产仪表盘',entry:'生产录入',records:'生产记录',payroll:'工资汇总',paysheet:'当月工资表',materials:'物料用量',employees:'员工管理',products:'产品工价'};
+let charts={};
+function navigate(view){
+ curView=view;
+ $$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===view));
+ $('#viewTitle').textContent=TITLES[view];
+ Object.values(charts).forEach(c=>{try{c.dispose()}catch(_){}});
+ charts={};render();
+}
+$('.nav').addEventListener('click',e=>{const it=e.target.closest('.nav-item');if(it)navigate(it.dataset.view)});
+function render(){
+ const c=$('#content');
+ ({dashboard:renderDashboard,entry:renderEntry,records:renderRecords,payroll:renderPayroll,paysheet:renderPaysheet,materials:renderMaterials,employees:renderEmployees,products:renderProducts})[curView](c);
+}
+window.addEventListener('resize',()=>Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}}));
+
+/* ===== 仪表盘 ===== */
+let dashDate=today();
+function renderDashboard(c){
+ ['trend','rank','pie','month'].forEach(k=>{if(charts[k]){try{charts[k].dispose()}catch(e){}charts[k]=null}});
+ const t=dashDate;
+ const ms=monthStart(t),yd=addDays(t,-1),meEnd=monthEnd(t);
+ const dayR=DB.records.filter(r=>r.date===t);
+ const ydR=DB.records.filter(r=>r.date===yd);
+ const monthR=DB.records.filter(r=>r.date>=ms&&r.date<=t);
+ const dq=dayR.reduce((s,r)=>s+(r.qtyGood||0),0),dw=dayR.reduce((s,r)=>s+wageOf(r),0),de=new Set(dayR.map(r=>r.empId)).size;
+ const ydq=ydR.reduce((s,r)=>s+(r.qtyGood||0),0),ydw=ydR.reduce((s,r)=>s+wageOf(r),0);
+ const cmp=(a,b)=>b===0?(a>0?'新增':'-'):((a-b)/b*100).toFixed(1)+'%';
+ const mg=monthR.reduce((s,r)=>s+(r.qtyGood||0),0),mb=monthR.reduce((s,r)=>s+(r.qtyBad||0),0);
+ const mw=monthR.reduce((s,r)=>s+wageOf(r),0);
+ const rate=mg+mb>0?mg/(mg+mb):1;
+ c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+   <label style="margin:0;color:var(--txt2)">查看日期：</label>
+   <input type="date" id="dashDate" value="${esc(t)}">
+   <button class="btn sm secondary" id="dashToday">回到今天</button>
+   <span style="color:var(--txt3);font-size:12px;flex:1">当前查看：${esc(t)}（选任意一天，KPI 和图表自动切换）</span></div>
+ <div class="kpi-grid">
+   <div class="kpi"><div class="kpi-label">当日总产量</div><div class="kpi-value">${dq}<small>件</small></div><div class="kpi-sub">${dayR.length}条 · 较昨日${cmp(dq,ydq)}</div></div>
+   <div class="kpi blue"><div class="kpi-label">当日工资总额</div><div class="kpi-value">${fmtMoney(dw)}<small>元</small></div><div class="kpi-sub">${de}人在产 · 较昨日${cmp(dw,ydw)}</div></div>
+   <div class="kpi yellow"><div class="kpi-label">本月累计产量</div><div class="kpi-value">${mg}<small>件</small></div><div class="kpi-sub">自 ${esc(ms)}</div></div>
+   <div class="kpi green"><div class="kpi-label">本月累计工资</div><div class="kpi-value">${fmtMoney(mw)}<small>元</small></div><div class="kpi-sub">全厂累计</div></div>
+   <div class="kpi"><div class="kpi-label">本月良品率</div><div class="kpi-value">${(rate*100).toFixed(1)}<small>%</small></div><div class="kpi-sub">不良 ${mb} 件</div></div>
+   <div class="kpi blue"><div class="kpi-label">员工总数</div><div class="kpi-value">${DB.employees.length}<small>人</small></div><div class="kpi-sub">${DB.products.length} 道工序</div></div></div>
+ <div class="charts-grid"><div class="card"><div class="card-title">近7日产量与工资趋势（以 ${esc(t)} 为今日）</div><div class="chart-box" id="chartTrend"></div></div><div class="card"><div class="card-title">当日员工工资排行（${esc(t)}）</div><div class="chart-box" id="chartRank"></div></div></div>
+ <div class="charts-grid"><div class="card"><div class="card-title">产品产量占比（${esc(t)} 当日）</div><div class="chart-box" id="chartPie"></div></div><div class="card"><div class="card-title">各工序当日不良预警（${esc(t)}）</div><div id="qcBox" style="max-height:320px;overflow-y:auto"></div></div></div>
+ <div class="charts-grid" style="grid-template-columns:1fr"><div class="card"><div class="card-title">月度每日工资趋势（${esc(t.slice(0,7))}）</div><div class="chart-box" id="chartMonth"></div></div></div>`;
+ $('#dashDate').addEventListener('change',e=>{dashDate=e.target.value;render()});
+ $('#dashToday').addEventListener('click',()=>{dashDate=today();render()});
+ const days=[];for(let i=6;i>=0;i--)days.push(addDays(t,-i));
+ const ym=t.slice(0,7);const dim=+monthEnd(t).slice(8);
+ const monthWages=[];for(let d=1;d<=dim;d++){const ds=ym+'-'+pad2(d);monthWages.push(monthR.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0))}
+ const ew=DB.employees.map(e=>({name:e.name,wage:dayR.filter(r=>r.empId===e.id).reduce((s,r)=>s+wageOf(r),0)})).filter(e=>e.wage>0).sort((a,b)=>b.wage-a.wage);
+ const dm=[...new Set(dayR.map(r=>r.model))];
+ /* 不良预警 */
+ const badList=dayR.filter(r=>(r.qtyBad||0)>0);
+ $('#qcBox').innerHTML=badList.length?badList.map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--line)"><span>${esc(empName(r.empId))} · ${esc(r.model)} ${esc(r.style)} ${esc(r.process)}</span><span class="badge red">不良 ${r.qtyBad}</span></div>`).join(''):'<div class="empty">当日无不良，质量良好</div>';
+ const emptyOpt={title:{text:'当日无生产记录',left:'center',top:'center',textStyle:{color:'#64748b',fontSize:14}},xAxis:{show:false},yAxis:{show:false},series:[]};
+ requestAnimationFrame(()=>{
+   charts.trend=echarts.init($('#chartTrend'));
+   charts.trend.setOption({tooltip:{trigger:'axis'},legend:{data:['产量','工资(元)'],textStyle:{color:'#94a3b8'}},grid:{left:50,right:50,top:40,bottom:30},xAxis:{type:'category',data:days.map(d=>d.slice(5)),axisLabel:{color:'#94a3b8'},axisLine:{lineStyle:{color:'#334155'}}},yAxis:[{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{show:false}}],series:[{name:'产量',type:'bar',data:days.map(d=>DB.records.filter(r=>r.date===d).reduce((s,r)=>s+(r.qtyGood||0),0)),itemStyle:{color:'#3b82f6',borderRadius:[4,4,0,0]}},{name:'工资(元)',type:'line',yAxisIndex:1,data:days.map(d=>DB.records.filter(r=>r.date===d).reduce((s,r)=>s+wageOf(r),0)),smooth:true,itemStyle:{color:'#f97316'},lineStyle:{width:3}}]});
+   charts.rank=echarts.init($('#chartRank'));
+   if(ew.length)charts.rank.setOption({tooltip:{trigger:'axis'},grid:{left:60,right:70,top:20,bottom:20},xAxis:{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},yAxis:{type:'category',data:ew.map(e=>e.name).reverse(),axisLabel:{color:'#94a3b8'}},series:[{type:'bar',data:ew.map(e=>+e.wage.toFixed(2)).reverse(),itemStyle:{color:'#f97316',borderRadius:[0,4,4,0]},label:{show:true,position:'right',color:'#94a3b8',formatter:'¥{c}'}}]});
+   else charts.rank.setOption(emptyOpt);
+   charts.pie=echarts.init($('#chartPie'));
+   if(dm.length)charts.pie.setOption({tooltip:{trigger:'item',formatter:'{b}: {c}件 ({d}%)'},legend:{bottom:0,textStyle:{color:'#94a3b8',fontSize:11}},series:[{type:'pie',radius:['40%','65%'],center:['50%','45%'],data:dm.map(m=>({name:m,value:dayR.filter(r=>r.model===m).reduce((s,r)=>s+(r.qtyGood||0),0)})),label:{color:'#94a3b8'},itemStyle:{borderColor:'#1e293b',borderWidth:2}}]});
+   else charts.pie.setOption(emptyOpt);
+   charts.month=echarts.init($('#chartMonth'));
+   charts.month.setOption({tooltip:{trigger:'axis'},grid:{left:60,right:30,top:30,bottom:30},xAxis:{type:'category',data:Array.from({length:dim},(_,i)=>i+1+'日'),axisLabel:{color:'#94a3b8'},axisLine:{lineStyle:{color:'#334155'}}},yAxis:{type:'value',axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#1e293b'}}},series:[{type:'bar',data:monthWages.map(x=>+x.toFixed(2)),itemStyle:{color:'#10b981',borderRadius:[4,4,0,0]}}]});
+   Object.values(charts).forEach(ch=>{if(ch)try{ch.resize()}catch(e){}});
+ });
+}
+
+/* ===== 生产录入 ===== */
 function renderEntry(c){
-  c.innerHTML=`<div class="tip no-print">💡 一个员工当天可干多种产品多道工序，每干一种点「+加一行」，全部填完点「保存」。</div>
-  <div class="entry-form no-print">
-    <div class="form-row grid-3"><div><label>日期</label><input type="date" id="entryDate" value="${today()}"></div><div><label>班次备注</label><input type="text" id="entryShift" placeholder="白班/夜班"></div><div style="display:flex;align-items:flex-end"><button class="btn" onclick="addEntryRow()" style="width:100%">+ 添加一行</button></div></div>
-    <div class="entry-row head"><div>员工</div><div>产品型号</div><div>款式</div><div>工序</div><div class="num">合格</div><div class="num">不良</div><div class="num">工资</div><div>备注</div><div></div></div>
-    <div id="entryRows"></div></div>
-  <div style="display:flex;gap:12px;justify-content:flex-end" class="no-print"><button class="btn secondary" onclick="navigate('records')">查看记录</button><button class="btn" onclick="saveEntries()">💾 保存当日记录</button></div>`;
-  addEntryRow();
+ c.innerHTML=`<div class="tip no-print">一个员工当天可干多种产品、多道工序；每干一种点「+ 添加一行」，全部填完点「保存当日记录」，保存后可继续录入。</div>
+ <div class="entry-form no-print">
+   <div class="form-row grid-3">
+     <div><label>日期</label><input type="date" id="entryDate" value="${esc(today())}"></div>
+     <div><label>班次备注</label><input type="text" id="entryShift" placeholder="白班 / 夜班"></div>
+     <div style="display:flex;align-items:flex-end"><button class="btn" id="btnAddRow" style="width:100%">+ 添加一行</button></div>
+   </div>
+   <div class="entry-row head"><div>员工</div><div>产品型号</div><div>款式</div><div>工序</div><div class="num">合格</div><div class="num">不良</div><div class="num">工资</div><div>备注</div><div></div></div>
+   <div id="entryRows"></div></div>
+ <div style="display:flex;gap:12px;justify-content:flex-end" class="no-print"><button class="btn secondary" id="btnViewRecords">查看记录</button><button class="btn" id="btnSaveEntries">保存当日记录</button></div>`;
+ $('#btnAddRow').addEventListener('click',addEntryRow);
+ $('#btnViewRecords').addEventListener('click',()=>navigate('records'));
+ $('#btnSaveEntries').addEventListener('click',saveEntries);
+ addEntryRow();
 }
 function productOptions(){return[...new Set(DB.products.map(p=>p.model))]}
 function styleOf(m){return[...new Set(DB.products.filter(p=>p.model===m).map(p=>p.style))]}
 function processOf(m,s){return DB.products.filter(p=>p.model===m&&p.style===s).map(p=>({name:p.process,price:p.price}))}
 function addEntryRow(){
-  const div=document.createElement('div');div.className='entry-row';
-  // 常用员工排序：按最近7天记录次数降序
-  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);const waStr=weekAgo.toISOString().slice(0,10);
-  const empUsage=DB.employees.map(e=>({e,c:DB.records.filter(r=>r.empId===e.id&&r.date>=waStr).length})).sort((a,b)=>b.c-a.c);
-  div.innerHTML=`<select class="e-emp">${empUsage.map(x=>`<option value="${x.e.id}">${x.e.id} ${x.e.name}${x.c?' ·最近':''}</option>`).join('')}</select><select class="e-model"><option value="">--选产品--</option>${productOptions().map(m=>`<option>${m}</option>`).join('')}</select><select class="e-style"><option value="">--选款式--</option></select><select class="e-proc"><option value="">--选工序--</option></select><input type="number" class="e-qtygood" min="0" value="0"><input type="number" class="e-qtybad" min="0" value="0"><div class="num e-wage" style="color:var(--accent);font-weight:600">¥0.00</div><input type="text" class="e-note" placeholder="备注"><button class="row-del" onclick="this.parentElement.remove()">×</button>`;
-  $('#entryRows').appendChild(div);
-  $('.e-model',div).addEventListener('change',()=>{$('.e-style',div).innerHTML='<option value="">--选款式--</option>'+styleOf($('.e-model',div).value).map(s=>`<option>${s}</option>`).join('');$('.e-proc',div).innerHTML='<option value="">--选工序--</option>';calcRow(div)});
-  $('.e-style',div).addEventListener('change',()=>{const m=$('.e-model',div).value,s=$('.e-style',div).value;$('.e-proc',div).innerHTML='<option value="">--选工序--</option>'+processOf(m,s).map(p=>`<option value="${p.name}">${p.name} (¥${p.price})</option>`).join('');calcRow(div)});
-  $('.e-proc',div).addEventListener('change',()=>calcRow(div));
-  $('.e-qtygood',div).addEventListener('input',()=>calcRow(div));
+ const div=document.createElement('div');div.className='entry-row';
+ const wa=addDays(today(),-7);
+ const empUsage=DB.employees.map(e=>({e,c:DB.records.filter(r=>r.empId===e.id&&r.date>=wa).length})).sort((a,b)=>b.c-a.c);
+ div.innerHTML=`<select class="e-emp">${empUsage.map(x=>`<option value="${esc(x.e.id)}">${esc(x.e.id)} ${esc(x.e.name)}${x.c?' · 常用':''}</option>`).join('')}</select>
+  <select class="e-model"><option value="">--选产品--</option>${productOptions().map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>
+  <select class="e-style"><option value="">--选款式--</option></select>
+  <select class="e-proc"><option value="">--选工序--</option></select>
+  <input type="number" class="e-qtygood" min="0" value="0">
+  <input type="number" class="e-qtybad" min="0" value="0">
+  <div class="num e-wage" style="color:var(--accent);font-weight:600">¥0.00</div>
+  <input type="text" class="e-note" placeholder="备注">
+  <button class="row-del" type="button">×</button>`;
+ $('#entryRows').appendChild(div);
+ $('.row-del',div).addEventListener('click',()=>div.remove());
+ $('.e-model',div).addEventListener('change',()=>{
+  $('.e-style',div).innerHTML='<option value="">--选款式--</option>'+styleOf($('.e-model',div).value).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  $('.e-proc',div).innerHTML='<option value="">--选工序--</option>';calcRow(div);
+ });
+ $('.e-style',div).addEventListener('change',()=>{
+  const m=$('.e-model',div).value,s=$('.e-style',div).value;
+  $('.e-proc',div).innerHTML='<option value="">--选工序--</option>'+processOf(m,s).map(p=>`<option value="${esc(p.name)}">${esc(p.name)} (¥${p.price})</option>`).join('');
+  calcRow(div);
+ });
+ $('.e-proc',div).addEventListener('change',()=>calcRow(div));
+ $('.e-qtygood',div).addEventListener('input',()=>calcRow(div));
 }
-function calcRow(div){const m=$('.e-model',div).value,s=$('.e-style',div).value,p=$('.e-proc',div).value;const g=+$('.e-qtygood',div).value||0;$('.e-wage',div).textContent='¥'+(g*(p?priceOf(m,s,p):0)).toFixed(2)}
-function saveEntries(){
-  const date=$('#entryDate').value;if(!date){toast('请选日期',true);return}
-  let saved=0;
-  $$('#entryRows .entry-row').forEach(r=>{
-    const emp=$('.e-emp',r).value,model=$('.e-model',r).value,style=$('.e-style',r).value,proc=$('.e-proc',r).value;
-    const g=+$('.e-qtygood',r).value||0,b=+$('.e-qtybad',r).value||0,note=$('.e-note',r).value.trim();
-    if(!model||!style||!proc)return;
-    DB.records.push({id:nextId(),date,empId:emp,model,style,process:proc,qtyGood:g,qtyBad:b,note,updated_at:tsNow()});saved++;
-  });
-  if(!saved){toast('没有有效行',true);return}
-  save();toast(`已保存 ${saved} 条`);$('#entryRows').innerHTML='';addEntryRow();
+function calcRow(div){
+ const m=$('.e-model',div).value,s=$('.e-style',div).value,p=$('.e-proc',div).value;
+ const g=+$('.e-qtygood',div).value||0;
+ $('.e-wage',div).textContent='¥'+fmtMoney(g*(p?priceOf(m,s,p):0));
 }
-
-/* ==== 生产记录（含编辑、搜索、分页） ==== */
+async function saveEntries(){
+ const date=$('#entryDate').value;
+ if(!date){toast('请选日期',true);return}
+ const shift=$('#entryShift').value.trim();
+ const rows=$$('#entryRows .entry-row');
+ let ok=0,fail=0;
+ for(const r of rows){
+  const emp=$('.e-emp',r).value,model=$('.e-model',r).value,style=$('.e-style',r).value,proc=$('.e-proc',r).value;
+  const g=+$('.e-qtygood',r).value||0,b=+$('.e-qtybad',r).value||0;
+  let note=$('.e-note',r).value.trim();
+  if(shift)note=(shift+(note?' / '+note:''));
+  if(!model||!style||!proc){fail++;continue}
+  try{await createRecord({date,empId:emp,model,style,process:proc,qtyGood:g,qtyBad:b,note});ok++}
+  catch(e){fail++}
+ }
+ if(!ok){toast('没有有效行，请检查产品/款式/工序',true);return}
+ audit('录入生产记录',date,{成功:ok,失败:fail});
+ toast(`已保存 ${ok} 条${fail?'，'+fail+' 条未保存':''}`);
+ $('#entryRows').innerHTML='';addEntryRow();
+}
+/* ===== VIEWS2 ===== */
+/* ===== 生产记录 ===== */
 let recPage=1;const REC_PAGE_SIZE=50;
+function canEdit(r){return isAdmin||r.createdBy===me.id}
 function renderRecords(c){
-  const r=DB.records.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  c.innerHTML=`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap" class="no-print">
-    <input type="date" id="filterDate" style="width:160px">
-    <select id="filterEmp" style="width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join('')}</select>
-    <input type="text" id="filterKw" placeholder="搜索产品/工序/备注..." style="width:200px">
-    <button class="btn sm secondary" onclick="recPage=1;renderRecordsApply()">筛选</button><span style="flex:1"></span>
-    <button class="btn sm secondary" onclick="openBulkImport('records')">批量导入</button>
-    <span style="color:var(--txt2);font-size:12px" id="recCount"></span></div>
-  <div class="card" style="padding:0;overflow:auto;max-height:65vh">
+ c.innerHTML=`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap" class="no-print">
+   <input type="date" id="filterDate" style="width:160px">
+   <select id="filterEmp" style="width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</select>
+   <input type="text" id="filterKw" placeholder="搜索产品/工序/备注..." style="width:200px">
+   <span style="flex:1"></span>
+   <button class="btn sm secondary admin-only" id="btnBulkRec">批量导入</button>
+   <span style="color:var(--txt2);font-size:12px" id="recCount"></span></div>
+ <div class="card" style="padding:0;overflow:auto;max-height:65vh">
   <table><thead><tr><th>日期</th><th>员工</th><th>产品</th><th>款式</th><th>工序</th><th class="num">合格</th><th class="num">不良</th><th class="num">良品率</th><th class="num">工资</th><th>备注</th><th></th></tr></thead>
   <tbody id="recBody"></tbody></table></div>
-  <div id="recPager" style="display:flex;gap:8px;justify-content:center;padding:14px 0;align-items:center" class="no-print"></div>`;
-  $('#filterDate').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
-  $('#filterEmp').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
-  $('#filterKw').addEventListener('input',()=>{recPage=1;renderRecordsApply()});
-  renderRecordsApply();
+ <div id="recPager" style="display:flex;gap:8px;justify-content:center;padding:14px 0;align-items:center" class="no-print"></div>`;
+ $('#filterDate').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
+ $('#filterEmp').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
+ $('#filterKw').addEventListener('input',()=>{recPage=1;renderRecordsApply()});
+ const bb=$('#btnBulkRec');if(bb)bb.addEventListener('click',()=>openBulkImport('records'));
+ renderRecordsApply();
 }
 function getFilteredRecords(){
-  const d=$('#filterDate').value,e=$('#filterEmp').value,k=($('#filterKw').value||'').trim().toLowerCase();
-  let r=DB.records.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  if(d)r=r.filter(x=>x.date===d);
-  if(e)r=r.filter(x=>x.empId===e);
-  if(k)r=r.filter(x=>(x.model+x.style+x.process+(x.note||'')).toLowerCase().includes(k));
-  return r;
+ const d=$('#filterDate').value,e=$('#filterEmp').value,k=($('#filterKw').value||'').trim().toLowerCase();
+ let r=DB.records.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ if(d)r=r.filter(x=>x.date===d);
+ if(e)r=r.filter(x=>x.empId===e);
+ if(k)r=r.filter(x=>(x.model+x.style+x.process+(x.note||'')).toLowerCase().includes(k));
+ return r;
 }
 function renderRecordsApply(){
-  const r=getFilteredRecords();
-  const totalPages=Math.max(1,Math.ceil(r.length/REC_PAGE_SIZE));
-  if(recPage>totalPages)recPage=totalPages;
-  const start=(recPage-1)*REC_PAGE_SIZE,pageData=r.slice(start,start+REC_PAGE_SIZE);
-  $('#recCount').textContent=`共 ${r.length} 条${r.length!==DB.records.length?'（筛选自'+DB.records.length+'条）':''}`;
-  $('#recBody').innerHTML=pageData.map(x=>{const rate=x.qtyGood+x.qtyBad>0?x.qtyGood/(x.qtyGood+x.qtyBad):1;return`<tr><td>${x.date}</td><td>${empName(x.empId)}</td><td>${x.model}</td><td>${x.style}</td><td>${x.process}</td><td class="num">${x.qtyGood}</td><td class="num" style="${x.qtyBad>0?'color:var(--red)':''}">${x.qtyBad}</td><td><span class="badge ${rate<0.95?'red':'green'}">${(rate*100).toFixed(1)}%</span></td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(wageOf(x))}</td><td style="color:var(--txt2);font-size:12px">${x.note||''}</td><td style="white-space:nowrap"><button class="btn sm secondary" onclick="editRecord(${x.id})" style="margin-right:4px">改</button><button class="btn sm danger" onclick="delRecord(${x.id})">删</button></td></tr>`}).join('')||'<tr><td colspan="11" class="empty">无匹配记录</td></tr>';
-  $('#recPager').innerHTML=`<button class="btn sm secondary" ${recPage<=1?'disabled style="opacity:.4"':''} onclick="recPage--;renderRecordsApply()">上一页</button><span style="color:var(--txt2);font-size:12px">第 ${recPage} / ${totalPages} 页</span><button class="btn sm secondary" ${recPage>=totalPages?'disabled style="opacity:.4"':''} onclick="recPage++;renderRecordsApply()">下一页</button>`;
+ const r=getFilteredRecords();
+ const totalPages=Math.max(1,Math.ceil(r.length/REC_PAGE_SIZE));
+ if(recPage>totalPages)recPage=totalPages;
+ const start=(recPage-1)*REC_PAGE_SIZE,pageData=r.slice(start,start+REC_PAGE_SIZE);
+ $('#recCount').textContent=`共 ${r.length} 条${r.length!==DB.records.length?'（筛选自 '+DB.records.length+' 条）':''}`;
+ $('#recBody').innerHTML=pageData.map(x=>{
+   const tot=x.qtyGood+x.qtyBad,rr=tot>0?x.qtyGood/tot:1;
+   const acts=canEdit(x)?`<button class="btn sm secondary" data-edit="${x.id}" style="margin-right:4px">改</button>${isAdmin?`<button class="btn sm danger" data-del="${x.id}">删</button>`:''}`:'<span style="color:var(--txt3);font-size:11px">仅查看</span>';
+   return `<tr><td>${esc(x.date)}</td><td>${esc(empName(x.empId))}</td><td>${esc(x.model)}</td><td>${esc(x.style)}</td><td>${esc(x.process)}</td><td class="num">${x.qtyGood}</td><td class="num" style="${x.qtyBad>0?'color:var(--red)':''}">${x.qtyBad}</td><td><span class="badge ${rr<0.95?'red':'green'}">${(rr*100).toFixed(1)}%</span></td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(wageOf(x))}</td><td style="color:var(--txt2);font-size:12px">${esc(x.note||'')}</td><td style="white-space:nowrap">${acts}</td></tr>`;
+ }).join('')||'<tr><td colspan="11" class="empty">无匹配记录</td></tr>';
+ $$('#recBody [data-edit]').forEach(b=>b.addEventListener('click',()=>editRecord(+b.dataset.edit)));
+ $$('#recBody [data-del]').forEach(b=>b.addEventListener('click',()=>delRecord(+b.dataset.del)));
+ $('#recPager').innerHTML=`<button class="btn sm secondary" id="pgPrev" ${recPage<=1?'disabled style="opacity:.4"':''}>上一页</button><span style="color:var(--txt2);font-size:12px">第 ${recPage} / ${totalPages} 页</span><button class="btn sm secondary" id="pgNext" ${recPage>=totalPages?'disabled style="opacity:.4"':''}>下一页</button>`;
+ const pv=$('#pgPrev'),nx=$('#pgNext');
+ if(pv&&recPage>1)pv.addEventListener('click',()=>{recPage--;renderRecordsApply()});
+ if(nx&&recPage<totalPages)nx.addEventListener('click',()=>{recPage++;renderRecordsApply()});
 }
-function delRecord(id){if(!confirm('确定删除？'))return;markDeleted('records',id);DB.records=DB.records.filter(r=>r.id!==id);save();render();toast('已删除')}
+async function delRecord(id){
+ if(!confirm('确定删除该条记录？'))return;
+ try{await deleteRecord(id);audit('删除生产记录',String(id),null);toast('已删除')}
+ catch(e){toast('删除失败：'+e.message,true)}
+}
 function editRecord(id){
-  const r=DB.records.find(x=>x.id===id);if(!r)return;
-  modal(`<h3>编辑生产记录</h3>
-    <div class="form-row"><label>日期</label><input type="date" id="erDate" value="${r.date}"></div>
-    <div class="form-row"><label>员工</label><select id="erEmp">${DB.employees.map(e=>`<option value="${e.id}" ${e.id===r.empId?'selected':''}>${e.id} ${e.name}</option>`).join('')}</select></div>
-    <div class="form-row"><label>产品型号</label><select id="erModel">${productOptions().map(m=>`<option ${m===r.model?'selected':''}>${m}</option>`).join('')}</select></div>
-    <div class="form-row grid-3">
-      <div><label>款式</label><select id="erStyle">${styleOf(r.model).map(s=>`<option ${s===r.style?'selected':''}>${s}</option>`).join('')}</select></div>
-      <div><label>工序</label><select id="erProc">${processOf(r.model,r.style).map(p=>`<option ${p.name===r.process?'selected':''} value="${p.name}">${p.name}</option>`).join('')}</select></div>
-      <div><label>工价(自动)</label><input id="erPrice" value="${priceOf(r.model,r.style,r.process)}" readonly style="background:var(--bg3);color:var(--yellow)"></div>
-    </div>
-    <div class="form-row grid-3">
-      <div><label>合格数</label><input type="number" id="erGood" min="0" value="${r.qtyGood}"></div>
-      <div><label>不良数</label><input type="number" id="erBad" min="0" value="${r.qtyBad}"></div>
-      <div><label>备注</label><input id="erNote" value="${r.note||''}"></div>
-    </div>
-    <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="saveEditRecord(${id})">保存修改</button></div>`);
-  $('#erModel').addEventListener('change',()=>{$('#erStyle').innerHTML=styleOf($('#erModel').value).map(s=>`<option>${s}</option>`).join('');$('#erStyle').dispatchEvent(new Event('change'))});
-  $('#erStyle').addEventListener('change',()=>{const m=$('#erModel').value,s=$('#erStyle').value;$('#erProc').innerHTML=processOf(m,s).map(p=>`<option value="${p.name}">${p.name}</option>`).join('');$('#erProc').dispatchEvent(new Event('change'))});
-  $('#erProc').addEventListener('change',()=>{$('#erPrice').value=priceOf($('#erModel').value,$('#erStyle').value,$('#erProc').value)});
+ const r=DB.records.find(x=>x.id===id);if(!r)return;
+ modal(`<h3>编辑生产记录</h3>
+  <div class="form-row"><label>日期</label><input type="date" id="erDate" value="${esc(r.date)}"></div>
+  <div class="form-row"><label>员工</label><select id="erEmp">${DB.employees.map(e=>`<option value="${esc(e.id)}" ${e.id===r.empId?'selected':''}>${esc(e.id)} ${esc(e.name)}</option>`).join('')}</select></div>
+  <div class="form-row"><label>产品型号</label><select id="erModel">${productOptions().map(m=>`<option value="${esc(m)}" ${m===r.model?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+  <div class="form-row grid-3">
+   <div><label>款式</label><select id="erStyle">${styleOf(r.model).map(s=>`<option value="${esc(s)}" ${s===r.style?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+   <div><label>工序</label><select id="erProc">${processOf(r.model,r.style).map(p=>`<option value="${esc(p.name)}" ${p.name===r.process?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+   <div><label>工价(自动)</label><input id="erPrice" value="${priceOf(r.model,r.style,r.process)}" readonly style="background:var(--bg3);color:var(--yellow)"></div>
+  </div>
+  <div class="form-row grid-3">
+   <div><label>合格数</label><input type="number" id="erGood" min="0" value="${r.qtyGood}"></div>
+   <div><label>不良数</label><input type="number" id="erBad" min="0" value="${r.qtyBad}"></div>
+   <div><label>备注</label><input id="erNote" value="${esc(r.note||'')}"></div>
+  </div>
+  <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" id="erSave">保存修改</button></div>`);
+ $('#erModel').addEventListener('change',()=>{
+  $('#erStyle').innerHTML=styleOf($('#erModel').value).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  $('#erStyle').dispatchEvent(new Event('change'));
+ });
+ $('#erStyle').addEventListener('change',()=>{
+  const m=$('#erModel').value,s=$('#erStyle').value;
+  $('#erProc').innerHTML=processOf(m,s).map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+  $('#erProc').dispatchEvent(new Event('change'));
+ });
+ $('#erProc').addEventListener('change',()=>{$('#erPrice').value=priceOf($('#erModel').value,$('#erStyle').value,$('#erProc').value)});
+ $('#erSave').addEventListener('click',()=>saveEditRecord(id));
 }
-function saveEditRecord(id){
-  const r=DB.records.find(x=>x.id===id);if(!r)return;
-  r.date=$('#erDate').value;r.empId=$('#erEmp').value;r.model=$('#erModel').value;r.style=$('#erStyle').value;r.process=$('#erProc').value;
-  r.qtyGood=+$('#erGood').value||0;r.qtyBad=+$('#erBad').value||0;r.note=$('#erNote').value.trim();
-  r.updated_at=tsNow();
-  save();closeModal();toast('已保存修改');render();
+async function saveEditRecord(id){
+ const o={date:$('#erDate').value,empId:$('#erEmp').value,model:$('#erModel').value,style:$('#erStyle').value,process:$('#erProc').value,qtyGood:+$('#erGood').value||0,qtyBad:+$('#erBad').value||0,note:$('#erNote').value.trim()};
+ try{await updateRecord(id,o);audit('修改生产记录',String(id),o);closeModal();toast('已保存修改')}
+ catch(e){toast('保存失败：'+e.message,true)}
 }
 
-/* ==== 工资汇总 ==== */
+/* ===== 工资汇总（仅管理员）===== */
 function renderPayroll(c){
-  const t=today(),ym=t.slice(0,7);
-  c.innerHTML=`<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:16px;align-items:center;flex-wrap">
-    <div><label>① 查单日</label><input type="date" id="payDate" value="${t}"></div>
-    <div><label>② 选月份</label><input type="month" id="payMonth" value="${ym}"></div>
-    <div><label>③ 选员工</label><select id="payEmp" style="min-width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${e.id}">${e.id} ${e.name}</option>`).join('')}</select></div>
-    <div style="flex:1"></div>
-    <button class="btn sm secondary" onclick="exportMonthSummary()">导出月度汇总(xlsx)</button></div></div>
-  <div class="card" style="margin-bottom:14px"><div class="card-title" id="dayTitle">当日明细</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">产量</th><th class="num">工资</th><th>记录数</th></tr></thead><tbody id="dayBody"></tbody></table></div>
-  <div class="card"><div class="card-title" id="monthTitle">月度累计</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">出勤</th><th class="num">产量</th><th class="num">工资</th><th class="num">日均</th><th class="num">排名</th></tr></thead><tbody id="monthBody"></tbody></table></div>`;
-  $('#payDate').addEventListener('change',updatePayroll);$('#payMonth').addEventListener('change',updatePayroll);$('#payEmp').addEventListener('change',updatePayroll);
-  updatePayroll();
+ const t=today(),ym=t.slice(0,7);
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+   <div><label>① 查单日</label><input type="date" id="payDate" value="${esc(t)}"></div>
+   <div><label>② 选月份</label><input type="month" id="payMonth" value="${esc(ym)}"></div>
+   <div><label>③ 选员工</label><select id="payEmp" style="min-width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}">${esc(e.id)} ${esc(e.name)}</option>`).join('')}</select></div>
+   <div style="flex:1"></div>
+   <button class="btn sm secondary" id="btnExportMonth">导出月度汇总(xlsx)</button></div></div>
+ <div class="card" style="margin-bottom:14px"><div class="card-title" id="dayTitle">当日明细</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">产量</th><th class="num">工资</th><th>记录数</th></tr></thead><tbody id="dayBody"></tbody></table></div>
+ <div class="card"><div class="card-title" id="monthTitle">月度累计</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">出勤</th><th class="num">产量</th><th class="num">工资</th><th class="num">日均</th><th class="num">排名</th></tr></thead><tbody id="monthBody"></tbody></table></div>`;
+ $('#payDate').addEventListener('change',updatePayroll);
+ $('#payMonth').addEventListener('change',updatePayroll);
+ $('#payEmp').addEventListener('change',updatePayroll);
+ $('#btnExportMonth').addEventListener('click',exportMonthSummary);
+ updatePayroll();
 }
 function updatePayroll(){
-  const d=$('#payDate').value,ym=$('#payMonth').value,ef=$('#payEmp').value;
-  $('#dayTitle').textContent=`当日明细（${d}）`;
-  const dayR=DB.records.filter(r=>r.date===d&&(!ef||r.empId===ef));let h='',tq=0,tw=0;
-  DB.employees.forEach(e=>{if(ef&&e.id!==ef)return;const rs=dayR.filter(r=>r.empId===e.id);const q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);tq+=q;tw+=w;h+=`<tr><td>${e.id}</td><td>${e.name}</td><td><span class="badge blue">${e.team}</span></td><td class="num">${q}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(w)}</td><td>${rs.length}</td></tr>`});
-  if(tq>0)h+=`<tr style="font-weight:700;color:var(--red)"><td colspan="3">合计</td><td class="num">${tq}</td><td class="num">${fmtMoney(tw)}</td><td></td></tr>`;
-  $('#dayBody').innerHTML=h||'<tr><td colspan="6" class="empty">当日无记录</td></tr>';
-  const ms=ym+'-01';const me=new Date(ym+'-01');me.setMonth(me.getMonth()+1);me.setDate(0);const meStr=me.toISOString().slice(0,10);
-  $('#monthTitle').textContent=`月度累计（${ms} ~ ${meStr}${ef?' · '+empName(ef):''}）`;
-  const mr=DB.records.filter(r=>r.date>=ms&&r.date<=meStr&&(!ef||r.empId===ef));
-  const stats=DB.employees.filter(e=>!ef||e.id===ef).map(e=>{const rs=mr.filter(r=>r.empId===e.id);const days=new Set(rs.map(r=>r.date)).size;const q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);return{...e,days,q,w,avg:days>0?w/days:0}}).sort((a,b)=>b.w-a.w);
-  let mh=stats.map((s,i)=>`<tr><td>${s.id}</td><td style="font-weight:600">${s.name}</td><td><span class="badge blue">${s.team}</span></td><td class="num">${s.days}</td><td class="num">${s.q}</td><td class="num" style="color:var(--accent);font-weight:700;font-size:14px">${fmtMoney(s.w)}</td><td class="num">${fmtMoney(s.avg)}</td><td class="num"><span class="badge ${i<3?'yellow':'blue'}">第${i+1}名</span></td></tr>`).join('');
-  const sq=stats.reduce((s,x)=>s+x.q,0),sw=stats.reduce((s,x)=>s+x.w,0);
-  if(stats.length)mh+=`<tr style="font-weight:700;color:var(--red);background:var(--bg3)"><td colspan="4">合计</td><td class="num">${sq}</td><td class="num" style="font-size:15px">${fmtMoney(sw)}</td><td colspan="2"></td></tr>`;
-  $('#monthBody').innerHTML=mh||'<tr><td colspan="8" class="empty">该月无记录</td></tr>';
+ const d=$('#payDate').value,ym=$('#payMonth').value,ef=$('#payEmp').value;
+ $('#dayTitle').textContent=`当日明细（${d}）`;
+ const dayR=DB.records.filter(r=>r.date===d&&(!ef||r.empId===ef));
+ let h='',tq=0,tw=0;
+ DB.employees.forEach(e=>{
+  if(ef&&e.id!==ef)return;
+  const rs=dayR.filter(r=>r.empId===e.id),q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);
+  tq+=q;tw+=w;
+  h+=`<tr><td>${esc(e.id)}</td><td>${esc(e.name)}</td><td><span class="badge blue">${esc(e.team)}</span></td><td class="num">${q}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(w)}</td><td>${rs.length}</td></tr>`;
+ });
+ if(tq>0)h+=`<tr style="font-weight:700;color:var(--red)"><td colspan="3">合计</td><td class="num">${tq}</td><td class="num">${fmtMoney(tw)}</td><td></td></tr>`;
+ $('#dayBody').innerHTML=h||'<tr><td colspan="6" class="empty">当日无记录</td></tr>';
+ const ms=monthStart(ym),mend=monthEnd(ym);
+ $('#monthTitle').textContent=`月度累计（${ms} ~ ${mend}${ef?' · '+esc(empName(ef)):''}）`;
+ const mr=DB.records.filter(r=>r.date>=ms&&r.date<=mend&&(!ef||r.empId===ef));
+ const stats=DB.employees.filter(e=>!ef||e.id===ef).map(e=>{
+  const rs=mr.filter(r=>r.empId===e.id),days=new Set(rs.map(r=>r.date)).size,q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);
+  return{...e,days,q,w,avg:days>0?w/days:0};
+ }).sort((a,b)=>b.w-a.w);
+ let mh=stats.map((s,i)=>`<tr><td>${esc(s.id)}</td><td style="font-weight:600">${esc(s.name)}</td><td><span class="badge blue">${esc(s.team)}</span></td><td class="num">${s.days}</td><td class="num">${s.q}</td><td class="num" style="color:var(--accent);font-weight:700;font-size:14px">${fmtMoney(s.w)}</td><td class="num">${fmtMoney(s.avg)}</td><td class="num"><span class="badge ${i<3?'yellow':'blue'}">第${i+1}名</span></td></tr>`).join('');
+ const sq=stats.reduce((s,x)=>s+x.q,0),sw=stats.reduce((s,x)=>s+x.w,0);
+ if(stats.length)mh+=`<tr style="font-weight:700;color:var(--red);background:var(--bg3)"><td colspan="4">合计</td><td class="num">${sq}</td><td class="num" style="font-size:15px">${fmtMoney(sw)}</td><td colspan="2"></td></tr>`;
+ $('#monthBody').innerHTML=mh||'<tr><td colspan="8" class="empty">该月无记录</td></tr>';
 }
 async function exportMonthSummary(){
-  try{
-    if(typeof ExcelJS==='undefined'){toast('Excel组件未加载',true);return}
-    toast('生成中...');
-    const ym=$('#payMonth').value;
-    const ms=ym+'-01';const me=new Date(ym+'-01');me.setMonth(me.getMonth()+1);me.setDate(0);const meStr=me.toISOString().slice(0,10);
-    const mr=DB.records.filter(r=>r.date>=ms&&r.date<=meStr);
-    const stats=DB.employees.map(e=>{const rs=mr.filter(r=>r.empId===e.id);const days=new Set(rs.map(r=>r.date)).size;const q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);return{...e,days,q,w}}).sort((a,b)=>b.w-a.w);
-    const wb=new ExcelJS.Workbook();const ws=wb.addWorksheet('月度汇总');
-    ws.columns=[{width:8},{width:12},{width:10},{width:10},{width:12},{width:14}];
-    ws.mergeCells(1,1,1,6);ws.getCell(1,1).value=ym.replace('-','年')+'月 工资汇总表';
-    ws.getCell(1,1).font={size:16,bold:true,color:{argb:'FFFFFFFF'}};
-    ws.getCell(1,1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}};
-    ws.getCell(1,1).alignment={horizontal:'center',vertical:'middle'};ws.getRow(1).height=36;
-    ['工号','姓名','班组','出勤天数','产量','工资'].forEach((h,i)=>{ws.getCell(2,i+1).value=h;ws.getCell(2,i+1).font={bold:true,color:{argb:'FFFFFFFF'}};ws.getCell(2,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2C5282'}};ws.getCell(2,i+1).alignment={horizontal:'center'}});
-    stats.forEach((s,i)=>{ws.getCell(3+i,1).value=s.id;ws.getCell(3+i,2).value=s.name;ws.getCell(3+i,3).value=s.team;ws.getCell(3+i,4).value=s.days;ws.getCell(3+i,5).value=s.q;ws.getCell(3+i,6).value=+s.w.toFixed(2);ws.getCell(3+i,6).numFmt='¥#,##0.00';if(i%2===1)for(let c=1;c<=6;c++)ws.getCell(3+i,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F9FC'}}});
-    const tr=3+stats.length;
-    ws.getCell(tr,1).value='合计';ws.mergeCells(tr,1,tr,3);ws.getCell(tr,4).value=stats.reduce((s,x)=>s+x.days,0);ws.getCell(tr,5).value=stats.reduce((s,x)=>s+x.q,0);ws.getCell(tr,6).value=+stats.reduce((s,x)=>s+x.w,0).toFixed(2);ws.getCell(tr,6).numFmt='¥#,##0.00';
-    for(let c=1;c<=6;c++){ws.getCell(tr,c).font={bold:true,color:{argb:'FFFFFFFF'}};ws.getCell(tr,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}}};
-    const buf=await wb.xlsx.writeBuffer();const blob=new Blob([buf]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`月度汇总_${ym}.xlsx`;a.click();
-    toast('已导出');
-  }catch(e){toast('导出失败',true)}
+ try{
+  if(typeof ExcelJS==='undefined'){toast('Excel 组件未加载',true);return}
+  toast('生成中...');
+  const ym=$('#payMonth').value,ms=monthStart(ym),mend=monthEnd(ym);
+  const mr=DB.records.filter(r=>r.date>=ms&&r.date<=mend);
+  const stats=DB.employees.map(e=>{
+   const rs=mr.filter(r=>r.empId===e.id),days=new Set(rs.map(r=>r.date)).size,q=rs.reduce((s,r)=>s+(r.qtyGood||0),0),w=rs.reduce((s,r)=>s+wageOf(r),0);
+   return{...e,days,q,w};
+  }).sort((a,b)=>b.w-a.w);
+  const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('月度汇总');
+  ws.columns=[{width:8},{width:12},{width:10},{width:10},{width:12},{width:14}];
+  ws.mergeCells(1,1,1,6);ws.getCell(1,1).value=ym.replace('-','年')+'月 工资汇总表';
+  ws.getCell(1,1).font={size:16,bold:true,color:{argb:'FFFFFFFF'}};
+  ws.getCell(1,1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}};
+  ws.getCell(1,1).alignment={horizontal:'center',vertical:'middle'};ws.getRow(1).height=36;
+  ['工号','姓名','班组','出勤天数','产量','工资'].forEach((hh,i)=>{
+   const c=ws.getCell(2,i+1);c.value=hh;c.font={bold:true,color:{argb:'FFFFFFFF'}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2C5282'}};c.alignment={horizontal:'center'};
+  });
+  stats.forEach((s,i)=>{
+   ws.getCell(3+i,1).value=s.id;ws.getCell(3+i,2).value=s.name;ws.getCell(3+i,3).value=s.team;
+   ws.getCell(3+i,4).value=s.days;ws.getCell(3+i,5).value=s.q;
+   ws.getCell(3+i,6).value=+s.w.toFixed(2);ws.getCell(3+i,6).numFmt='¥#,##0.00';
+   if(i%2===1)for(let c=1;c<=6;c++)ws.getCell(3+i,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F9FC'}};
+  });
+  const tr=3+stats.length;
+  ws.getCell(tr,1).value='合计';ws.mergeCells(tr,1,tr,3);
+  ws.getCell(tr,4).value=stats.reduce((s,x)=>s+x.days,0);
+  ws.getCell(tr,5).value=stats.reduce((s,x)=>s+x.q,0);
+  ws.getCell(tr,6).value=+stats.reduce((s,x)=>s+x.w,0).toFixed(2);ws.getCell(tr,6).numFmt='¥#,##0.00';
+  for(let c=1;c<=6;c++){ws.getCell(tr,c).font={bold:true,color:{argb:'FFFFFFFF'}};ws.getCell(tr,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}}};
+  const buf=await wb.xlsx.writeBuffer(),blob=new Blob([buf]),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=`月度汇总_${ym}.xlsx`;a.click();
+  audit('导出月度汇总',ym,null);toast('已导出');
+ }catch(e){toast('导出失败',true)}
 }
 
-/* ==== 工资表（含导出财务xlsx） ==== */
+/* ===== 工资表（矩阵，仅管理员）===== */
 function renderPaysheet(c){
-  const ym=today().slice(0,7);
-  c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap">
-    <div><label>选择月份</label><input type="month" id="sheetMonth" value="${ym}"></div><div style="flex:1"></div>
-    <button class="btn sm secondary" onclick="saveAllTimeWages()">💾 保存计时工资</button>
-    <button class="btn sm" style="background:var(--green)" onclick="exportPayrollXlsx()">📊 导出财务工资表(xlsx)</button>
-    <button class="btn sm secondary" onclick="window.print()">🖨 打印/导出PDF</button></div>
-  <div class="tip no-print">💡 每天计件工资自动从生产记录带出；黄色「计时工资」列手填加班费/补贴，应发总工资=计件+计时。点绿色按钮可直接导出给财务的Excel表。</div>
-  <div class="sheet-wrap"><table class="paysheet" id="paysheetTable"></table></div>`;
-  $('#sheetMonth').addEventListener('change',renderPaysheetData);
-  renderPaysheetData();
+ const ym=today().slice(0,7);
+ c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+   <div><label>选择月份</label><input type="month" id="sheetMonth" value="${esc(ym)}"></div><div style="flex:1"></div>
+   <button class="btn sm secondary" id="btnSaveTime">保存计时工资</button>
+   <button class="btn sm" style="background:var(--green)" id="btnExportPay">导出财务工资表(xlsx)</button>
+   <button class="btn sm secondary" id="btnPrintPay">打印/导出PDF</button></div>
+ <div class="tip no-print">每天计件工资自动从生产记录带出；黄色「计时工资」列填加班费/补贴，应发总工资 = 计件 + 计时。</div>
+ <div class="sheet-wrap"><table class="paysheet" id="paysheetTable"></table></div>`;
+ $('#sheetMonth').addEventListener('change',renderPaysheetData);
+ $('#btnSaveTime').addEventListener('click',async()=>{
+  // 计时工资在输入时已即时保存，这里给确认反馈
+  toast('计时工资已保存')});
+ $('#btnExportPay').addEventListener('click',exportPayrollXlsx);
+ $('#btnPrintPay').addEventListener('click',()=>window.print());
+ renderPaysheetData();
+}
+async function saveTimeWage(ym,empId,amount){
+ const id=ym+'_'+empId;
+ const {error}=await sb.from('time_wages').upsert({id,ym,emp_id:empId,amount},{onConflict:'id'});
+ if(error)throw error;
+ DB.timeWages[id]=amount;
 }
 function renderPaysheetData(){
-  const ym=$('#sheetMonth').value||today().slice(0,7);
-  const ms=ym+'-01';const me=new Date(ym+'-01');me.setMonth(me.getMonth()+1);me.setDate(0);const dim=me.getDate();
-  const records=DB.records.filter(r=>r.date>=ms&&r.date<=me.toISOString().slice(0,10));
-  let html=`<thead><tr><th class="emp-col">工号</th><th class="emp-col">姓名</th>`;
-  for(let d=1;d<=dim;d++)html+=`<th class="num" style="min-width:52px">${d}日</th>`;
-  html+=`<th class="num sum-col">计件合计</th><th style="min-width:100px;text-align:center">计时工资</th><th class="num total-col">应发总工资</th></tr></thead><tbody>`;
-  let gp=0,gt=0,gtot=0;
-  DB.employees.forEach(e=>{
-    const er=records.filter(r=>r.empId===e.id);let ps=0;
-    html+=`<tr><td class="emp-col">${e.id}</td><td class="emp-col" style="font-weight:600">${e.name}</td>`;
-    for(let d=1;d<=dim;d++){const ds=ms.slice(0,8)+String(d).padStart(2,'0');const dw=er.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0);ps+=dw;html+=`<td class="num day-cell" style="${dw>0?'color:var(--txt);font-weight:500':'color:#475569'}">${dw>0?dw.toFixed(0):'·'}</td>`}
-    const key=ym+'_'+e.id;const tw=DB.timeWages[key]||0;const tot=ps+tw;
-    gp+=ps;gt+=tw;gtot+=tot;
-    html+=`<td class="num sum-col">${ps.toFixed(2)}</td><td class="num"><input class="time-wage" data-key="${key}" type="number" step="0.01" min="0" value="${tw||''}" placeholder="0.00"></td><td class="num total-col">${tot.toFixed(2)}</td></tr>`;
-  });
-  html+=`<tr style="font-weight:700;background:var(--bg3)"><td class="emp-col" colspan="2">全厂合计</td>`;
-  for(let d=1;d<=dim;d++){const ds=ms.slice(0,8)+String(d).padStart(2,'0');const dt=records.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0);html+=`<td class="num" style="font-size:11px;color:var(--txt2)">${dt>0?dt.toFixed(0):'·'}</td>`}
-  html+=`<td class="num sum-col">${gp.toFixed(2)}</td><td class="num" style="text-align:center;color:var(--yellow)">${gt.toFixed(2)}</td><td class="num total-col">${gtot.toFixed(2)}</td></tr></tbody>`;
-  $('#paysheetTable').innerHTML=html;
-  $$('.time-wage').forEach(inp=>inp.addEventListener('change',e=>{const key=e.target.dataset.key;const val=parseFloat(e.target.value)||0;DB.timeWages[key]=val;DB._timeMeta=DB._timeMeta||{};DB._timeMeta[key]=tsNow();save();const row=e.target.closest('tr');const piece=parseFloat(row.querySelector('.sum-col').textContent)||0;row.querySelector('.total-col').textContent=(piece+val).toFixed(2);toast('计时工资已更新')}));
-}
-function saveAllTimeWages(){save();toast('已保存')}
-
-/* 导出财务工资表 xlsx */
-async function exportPayrollXlsx(){
-  try{
-    if(typeof ExcelJS==='undefined'){toast('Excel组件未加载，请检查网络后刷新',true);return}
-    toast('正在生成...');
-    const ym=($('#sheetMonth')&&$('#sheetMonth').value)||today().slice(0,7);
-    const ms=ym+'-01';const me=new Date(ym+'-01');me.setMonth(me.getMonth()+1);me.setDate(0);const dim=me.getDate();const meStr=me.toISOString().slice(0,10);
-    const records=DB.records.filter(r=>r.date>=ms&&r.date<=meStr);
-    // 列：A序号 B姓名 C~AG(1~31) AH计件 AI计时 AJ应发 AK备注
-    const LAST_COL=dim+4; // 0-indexed, 最后一列
-    const colLetter=n=>{let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
-
-    const wb=new ExcelJS.Workbook();
-    const ws=wb.addWorksheet(ym.replace('-','年')+'月工资表',{views:[{state:'frozen',xSplit:2,ySplit:5}]});
-    // 列宽
-    ws.getColumn(1).width=5; ws.getColumn(2).width=10;
-    for(let d=1;d<=dim;d++)ws.getColumn(2+d).width=6;
-    ws.getColumn(dim+3).width=10;  // 计件
-    ws.getColumn(dim+4).width=10;  // 计时
-    ws.getColumn(dim+5).width=12; // 应发
-    ws.getColumn(dim+6).width=18;  // 备注
-
-    const NAVY='FF1B3A5C',NAVY2='FF2C5282',LIGHT='FFF7F9FC',GOLD='FFD4A84B',WHITE='FFFFFFFF',GRAY='FF718096',BORDER='FFD1D9E6',GREEN='FF2F855A';
-    const thinBorder={style:'thin',color:{argb:BORDER}};
-    const allBorder={top:thinBorder,left:thinBorder,bottom:thinBorder,right:thinBorder};
-
-    // 第1行：公司名
-    ws.mergeCells(1,1,1,LAST_COL+5);
-    let c=ws.getCell(1,1);c.value='嘉郁新材料科技有限公司';
-    c.font={name:'微软雅黑',size:18,bold:true,color:{argb:WHITE}};
-    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};
-    c.alignment={horizontal:'center',vertical:'middle'};
-    ws.getRow(1).height=40;
-
-    // 第2行：标题
-    ws.mergeCells(2,1,2,LAST_COL+5);
-    c=ws.getCell(2,1);c.value='计 件 工 资 表';
-    c.font={name:'微软雅黑',size:14,bold:true,color:{argb:NAVY}};
-    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:LIGHT}};
-    c.alignment={horizontal:'center',vertical:'middle'};
-    ws.getRow(2).height=28;
-
-    // 第3行：部门/月份/单位
-    ws.mergeCells(3,1,3,8);
-    c=ws.getCell(3,1);c.value='部门：生产车间';c.font={name:'微软雅黑',size:10};c.alignment={horizontal:'left',vertical:'middle'};
-    ws.mergeCells(3,9,3,20);
-    c=ws.getCell(3,9);c.value=ym.replace('-',' 年 ')+' 月份';c.font={name:'微软雅黑',size:10,bold:true,color:{argb:NAVY}};c.alignment={horizontal:'center',vertical:'middle'};
-    ws.mergeCells(3,21,3,LAST_COL+5);
-    c=ws.getCell(3,21);c.value='单位：元';c.font={name:'微软雅黑',size:9,color:{argb:GRAY}};c.alignment={horizontal:'right',vertical:'middle'};
-    ws.getRow(3).height=22;
-
-    // 第4-5行：表头
-    ws.mergeCells(4,1,5,1);ws.getCell(4,1).value='序号';
-    ws.mergeCells(4,2,5,2);ws.getCell(4,2).value='姓名';
-    for(let d=1;d<=dim;d++)ws.mergeCells(4,2+d,5,2+d),ws.getCell(4,2+d).value=d;
-    ws.mergeCells(4,dim+3,5,dim+3);ws.getCell(4,dim+3).value='计件合计';
-    ws.mergeCells(4,dim+4,5,dim+4);ws.getCell(4,dim+4).value='计时合计';
-    ws.mergeCells(4,dim+5,5,dim+5);ws.getCell(4,dim+5).value='应发工资';
-    ws.mergeCells(4,dim+6,5,dim+6);ws.getCell(4,dim+6).value='备注';
-    for(let col=1;col<=LAST_COL+5;col++){
-      for(let row=4;row<=5;row++){
-        c=ws.getCell(row,col);
-        c.font={name:'微软雅黑',size:10,bold:true,color:{argb:WHITE}};
-        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY2}};
-        c.alignment={horizontal:'center',vertical:'middle',wrapText:true};
-        c.border=allBorder;
-      }
-    }
-    ws.getRow(4).height=24;ws.getRow(5).height=20;
-
-    // 数据行
-    let r=6;let allPiece=0,allOt=0,allAmount=0;
-    DB.employees.forEach((e,ei)=>{
-      const rs=records.filter(x=>x.empId===e.id);
-      const bg=ei%2===0?LIGHT:WHITE;
-      // 合并序号、姓名、备注
-      ws.mergeCells(r,1,r+1,1);ws.getCell(r,1).value=ei+1;
-      ws.mergeCells(r,2,r+1,2);ws.getCell(r,2).value=e.name;
-      ws.mergeCells(r,dim+6,r+1,dim+6);
-      let pieceTotal=0,noteStr='';
-      for(let d=1;d<=dim;d++){
-        const ds=ms.slice(0,8)+String(d).padStart(2,'0');
-        const dayRs=rs.filter(x=>x.date===ds);
-        const p=dayRs.reduce((s,x)=>s+wageOf(x),0);
-        const note=dayRs.map(x=>x.note).filter(Boolean).join(';');
-        const cell1=ws.getCell(r,2+d),cell2=ws.getCell(r+1,2+d);
-        if(p>0){cell1.value=+p.toFixed(2);cell1.numFmt='0.00';pieceTotal+=p;}
-        else if(note){cell1.value=note;cell1.font={name:'微软雅黑',size:9,italic:true,color:{argb:GRAY}};noteStr=note;}
-        cell1.alignment={horizontal:p>0?'right':'center',vertical:'middle'};
-        cell2.alignment={horizontal:'right',vertical:'middle'};
-        cell1.border=allBorder;cell2.border=allBorder;
-        cell1.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
-        cell2.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
-        if(!cell1.font)cell1.font={name:'微软雅黑',size:10};
-        cell2.font={name:'微软雅黑',size:9,color:{argb:GRAY}};
-      }
-      const time=DB.timeWages[ym+'_'+e.id]||0;
-      const total=pieceTotal+time;
-      allPiece+=pieceTotal;allOt+=time;allAmount+=total;
-      // 三列合计
-      const ah=ws.getCell(r,dim+3);ah.value=+pieceTotal.toFixed(2);ah.numFmt='0.00';
-      const ai=ws.getCell(r,dim+4);ai.value=+time.toFixed(2);ai.numFmt='0.00';
-      const aj=ws.getCell(r,dim+5);aj.value=+total.toFixed(2);aj.numFmt='¥#,##0.00';
-      ws.getCell(r,dim+6).value=noteStr;
-      // 样式
-      for(let col=1;col<=LAST_COL+5;col++){
-        for(let row=r;row<=r+1;row++){
-          c=ws.getCell(row,col);
-          c.border=allBorder;
-          c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
-          if(col<=2){c.alignment={horizontal:'center',vertical:'middle'};c.font={name:'微软雅黑',size:10,bold:col===2};}
-          else if(col===dim+6){c.font={name:'微软雅黑',size:9,color:{argb:GRAY}};c.alignment={horizontal:'left',vertical:'middle',wrapText:true};}
-        }
-      }
-      ah.font={name:'微软雅黑',size:10,bold:true,color:{argb:NAVY}};
-      ai.font={name:'微软雅黑',size:10,color:{argb:GRAY}};
-      aj.font={name:'微软雅黑',size:11,bold:true,color:{argb:GREEN}};
-      ah.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
-      ai.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
-      aj.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
-      ws.getRow(r).height=20;ws.getRow(r+1).height=18;
-      r+=2;
-    });
-
-    // 合计行
-    ws.mergeCells(r,1,r,2);
-    c=ws.getCell(r,1);c.value='合 计';
-    for(let d=1;d<=dim;d++){
-      const ds=ms.slice(0,8)+String(d).padStart(2,'0');
-      let tp=0;records.filter(x=>x.date===ds).forEach(x=>tp+=wageOf(x));
-      if(tp>0){const cc=ws.getCell(r,2+d);cc.value=+tp.toFixed(2);cc.numFmt='0.00';cc.alignment={horizontal:'right',vertical:'middle'};}
-    }
-    ws.getCell(r,dim+3).value=+allPiece.toFixed(2);
-    ws.getCell(r,dim+4).value=+allOt.toFixed(2);
-    ws.getCell(r,dim+5).value=+allAmount.toFixed(2);
-    ws.getCell(r,dim+5).numFmt='¥#,##0.00';
-    for(let col=1;col<=LAST_COL+5;col++){
-      c=ws.getCell(r,col);
-      c.font={name:'微软雅黑',size:11,bold:true,color:{argb:WHITE}};
-      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};
-      c.alignment={horizontal:col<=2?'center':'right',vertical:'middle'};
-      c.border={top:{style:'medium',color:{argb:NAVY}},bottom:{style:'medium',color:{argb:NAVY}},left:thinBorder,right:thinBorder};
-    }
-    ws.getRow(r).height=28;
-    r+=2;
-
-    // 签字行
-    ws.mergeCells(r,1,r,12);ws.getCell(r,1).value='审核签字：';
-    ws.mergeCells(r,14,r,25);ws.getCell(r,14).value='制表签字：';
-    ws.mergeCells(r,27,r,LAST_COL+5);ws.getCell(r,27).value='发放日期：    年   月   日';
-    for(let col=1;col<=LAST_COL+5;col++){
-      c=ws.getCell(r,col);c.font={name:'微软雅黑',size:10};c.alignment={vertical:'middle'};
-    }
-    ws.getRow(r).height=30;
-
-    // 打印设置
-    ws.pageSetup={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.5,right:0.5,top:0.7,bottom:0.7}};
-
-    const buf=await wb.xlsx.writeBuffer();
-    const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`工资表_${ym}.xlsx`;a.click();
-    toast('已导出专业版工资表');
-  }catch(err){
-    console.error(err);
-    toast('导出失败: '+err.message,true);
+ const ym=$('#sheetMonth').value||today().slice(0,7);
+ const ms=monthStart(ym),dim=+monthEnd(ym).slice(8);
+ const records=DB.records.filter(r=>r.date>=ms&&r.date<=monthEnd(ym));
+ let html=`<thead><tr><th class="emp-col">工号</th><th class="emp-col">姓名</th>`;
+ for(let d=1;d<=dim;d++)html+=`<th class="num" style="min-width:52px">${d}日</th>`;
+ html+=`<th class="num sum-col">计件合计</th><th style="min-width:100px;text-align:center">计时工资</th><th class="num total-col">应发总工资</th></tr></thead><tbody>`;
+ let gp=0,gt=0,gtot=0;
+ DB.employees.forEach(e=>{
+  const er=records.filter(r=>r.empId===e.id);let ps=0;
+  html+=`<tr><td class="emp-col">${esc(e.id)}</td><td class="emp-col" style="font-weight:600">${esc(e.name)}</td>`;
+  for(let d=1;d<=dim;d++){
+   const ds=ym+'-'+pad2(d),dw=er.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0);
+   ps+=dw;
+   html+=`<td class="num day-cell" style="${dw>0?'color:var(--txt);font-weight:500':'color:#475569'}">${dw>0?dw.toFixed(0):'·'}</td>`;
   }
+  const key=ym+'_'+e.id,tw=DB.timeWages[key]||0,tot=ps+tw;
+  gp+=ps;gt+=tw;gtot+=tot;
+  html+=`<td class="num sum-col">${fmtMoney(ps)}</td><td class="num"><input class="time-wage" data-ym="${esc(ym)}" data-emp="${esc(e.id)}" type="number" step="0.01" min="0" value="${tw||''}" placeholder="0.00"></td><td class="num total-col">${fmtMoney(tot)}</td></tr>`;
+ });
+ html+=`<tr style="font-weight:700;background:var(--bg3)"><td class="emp-col" colspan="2">全厂合计</td>`;
+ for(let d=1;d<=dim;d++){
+  const ds=ym+'-'+pad2(d),dt=records.filter(r=>r.date===ds).reduce((s,r)=>s+wageOf(r),0);
+  html+=`<td class="num" style="font-size:11px;color:var(--txt2)">${dt>0?dt.toFixed(0):'·'}</td>`;
+ }
+ html+=`<td class="num sum-col">${fmtMoney(gp)}</td><td class="num" style="text-align:center;color:var(--yellow)">${fmtMoney(gt)}</td><td class="num total-col">${fmtMoney(gtot)}</td></tr></tbody>`;
+ $('#paysheetTable').innerHTML=html;
+ $$('.time-wage').forEach(inp=>inp.addEventListener('change',async ev=>{
+  const t=ev.target,ym=t.dataset.ym,emp=t.dataset.emp,val=parseFloat(t.value)||0;
+  try{
+   await saveTimeWage(ym,emp,val);
+   const row=t.closest('tr'),piece=parseFloat(row.querySelector('.sum-col').textContent)||0;
+   row.querySelector('.total-col').textContent=fmtMoney(piece+val);
+   toast('计时工资已更新');
+  }catch(e){toast('保存失败',true)}
+ }));
 }
+/* ===== VIEWS3 ===== */
+/* ---- 通用表 CRUD ---- */
+async function apiCreate(table,row){const{data,error}=await sb.from(table).insert(row).select('*').single();if(error)throw error;return data}
+async function apiUpdate(table,idCol,id,row){const{data,error}=await sb.from(table).update(row).eq(idCol,id).select('*').single();if(error)throw error;return data}
+async function apiDelete(table,idCol,id){const{error}=await sb.from(table).delete().eq(idCol,id);if(error)throw error}
 
-/* ==== 物料 ==== */
+/* ===== 物料 ===== */
 function renderMaterials(c){
-  c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">登记物料领用</div>
-    <div class="form-row grid-4"><div><label>日期</label><input type="date" id="matDate" value="${today()}"></div><div><label>物料名称</label><input id="matName" placeholder="PVC卷材/气嘴"></div><div><label>规格</label><input id="matSpec"></div><div><label>单位</label><input id="matUnit"></div></div>
-    <div class="form-row grid-4"><div><label>用量</label><input type="number" id="matQty" min="0" value="0"></div><div><label>单价</label><input type="number" id="matPrice" min="0" step="0.001" value="0"></div><div><label>领用人</label><input id="matPerson"></div><div><label style="visibility:hidden">.</label><button class="btn" onclick="saveMaterial()">保存</button></div></div></div>
-  <div class="card" style="padding:0;overflow:auto;max-height:60vh"><table><thead><tr><th>日期</th><th>物料</th><th>规格</th><th>单位</th><th class="num">用量</th><th class="num">单价</th><th class="num">金额</th><th>领用人</th><th></th></tr></thead><tbody id="matBody"></tbody></table></div>`;
-  updateMatTable();
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">登记物料领用</div>
+   <div class="form-row grid-4">
+    <div><label>日期</label><input type="date" id="matDate" value="${esc(today())}"></div>
+    <div><label>物料名称</label><input id="matName" placeholder="PVC卷材/气嘴"></div>
+    <div><label>规格</label><input id="matSpec"></div>
+    <div><label>单位</label><input id="matUnit"></div></div>
+   <div class="form-row grid-4">
+    <div><label>用量</label><input type="number" id="matQty" min="0" value="0"></div>
+    <div><label>单价</label><input type="number" id="matPrice" min="0" step="0.001" value="0"></div>
+    <div><label>领用人</label><input id="matPerson"></div>
+    <div><label style="visibility:hidden">.</label><button class="btn" id="matSave">保存</button></div></div></div>
+ <div class="card" style="padding:0;overflow:auto;max-height:60vh"><table><thead><tr><th>日期</th><th>物料</th><th>规格</th><th>单位</th><th class="num">用量</th><th class="num">单价</th><th class="num">金额</th><th>领用人</th><th></th></tr></thead><tbody id="matBody"></tbody></table></div>`;
+ $('#matSave').addEventListener('click',saveMaterial);
+ updateMatTable();
 }
-function updateMatTable(){$('#matBody').innerHTML=DB.materials.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(m=>`<tr><td>${m.date}</td><td>${m.name}</td><td>${m.spec||''}</td><td>${m.unit||''}</td><td class="num">${m.qty}</td><td class="num">${fmtPrice(m.price)}</td><td class="num" style="color:var(--accent);font-weight:600">¥${((+m.qty)*(+m.price)).toFixed(2)}</td><td>${m.person||''}</td><td><button class="btn sm danger" onclick="delMaterial(${m.id})">删</button></td></tr>`).join('')}
-function saveMaterial(){const n=$('#matName').value.trim();if(!n){toast('请填物料名',true);return}DB.materials.push({id:nextId(),date:$('#matDate').value,name:n,spec:$('#matSpec').value,unit:$('#matUnit').value,qty:+$('#matQty').value||0,price:+$('#matPrice').value||0,person:$('#matPerson').value,updated_at:tsNow()});save();toast('已登记');['matName','matSpec','matUnit','matPerson'].forEach(id=>$('#'+id).value='');$('#matQty').value=0;$('#matPrice').value=0;updateMatTable()}
-function delMaterial(id){markDeleted('materials',id);DB.materials=DB.materials.filter(m=>m.id!==id);save();updateMatTable();toast('已删除')}
+function updateMatTable(){
+ $('#matBody').innerHTML=DB.materials.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).map(m=>
+  `<tr><td>${esc(m.date)}</td><td>${esc(m.name)}</td><td>${esc(m.spec)}</td><td>${esc(m.unit)}</td><td class="num">${m.qty}</td><td class="num">${fmtPrice(m.price)}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney((+m.qty)*(+m.price))}</td><td>${esc(m.person)}</td><td>${isAdmin?`<button class="btn sm danger" data-matdel="${m.id}">删</button>`:''}</td></tr>`).join('')
+ ||'<tr><td colspan="9" class="empty">暂无物料记录</td></tr>';
+ $$('#matBody [data-matdel]').forEach(b=>b.addEventListener('click',()=>delMaterial(+b.dataset.matdel)));
+}
+async function saveMaterial(){
+ const name=$('#matName').value.trim();
+ if(!name){toast('请填物料名',true);return}
+ const row={work_date:$('#matDate').value,name,spec:$('#matSpec').value.trim(),unit:$('#matUnit').value.trim(),qty:+$('#matQty').value||0,price:+$('#matPrice').value||0,person:$('#matPerson').value.trim()};
+ try{
+  await apiCreate('materials',row);audit('登记物料',name,row);toast('已登记');
+  ['matName','matSpec','matUnit','matPerson'].forEach(i=>$('#'+i).value='');
+  $('#matQty').value=0;$('#matPrice').value=0;
+ }catch(e){toast('保存失败：'+e.message,true)}
+}
+async function delMaterial(id){
+ if(!confirm('确定删除该物料记录？'))return;
+ try{await apiDelete('materials','id',id);audit('删除物料',String(id),null);toast('已删除')}
+ catch(e){toast('删除失败：'+e.message,true)}
+}
 
-/* ==== 员工 ==== */
+/* ===== 员工 ===== */
 function renderEmployees(c){
-  c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">新增员工<div style="display:flex;gap:8px"><button class="btn sm secondary" onclick="openBulkImport('employees')">批量导入</button><button class="btn sm" onclick="saveEmp()">保存</button></div></div>
-    <div class="form-row grid-4"><div><label>工号</label><input id="neId" placeholder="E011"></div><div><label>姓名</label><input id="neName"></div><div><label>班组</label><select id="neTeam"><option>一班</option><option>二班</option><option>三班</option></select></div><div><label>岗位</label><input id="neRole"></div></div></div>
-  <div class="card" style="padding:0"><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th>岗位</th><th class="num">本月工资</th><th class="num">本月产量</th><th></th></tr></thead><tbody>${DB.employees.map(e=>{const ms=new Date();ms.setDate(1);const mss=ms.toISOString().slice(0,10);const rs=DB.records.filter(r=>r.empId===e.id&&r.date>=mss);const w=rs.reduce((s,r)=>s+wageOf(r),0),q=rs.reduce((s,r)=>s+(r.qtyGood||0),0);return`<tr><td>${e.id}</td><td style="font-weight:600">${e.name}</td><td><span class="badge blue">${e.team}</span></td><td>${e.role}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(w)}</td><td class="num">${q}</td><td style="white-space:nowrap"><button class="btn sm secondary" onclick="editEmp('${e.id}')" style="margin-right:4px">改</button><button class="btn sm danger" onclick="delEmp('${e.id}')">删</button></td></tr>`}).join('')}</tbody></table></div>`;
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">新增员工<div style="display:flex;gap:8px">
+   <button class="btn sm secondary admin-only" id="btnBulkEmp">批量导入</button>
+   <button class="btn sm" id="neSave">保存</button></div></div>
+  <div class="form-row grid-4">
+   <div><label>工号</label><input id="neId" placeholder="E019"></div>
+   <div><label>姓名</label><input id="neName"></div>
+   <div><label>班组</label><select id="neTeam"><option>一班</option><option>二班</option><option>三班</option></select></div>
+   <div><label>岗位</label><input id="neRole"></div></div></div>
+ <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th>岗位</th><th class="num">本月工资</th><th class="num">本月产量</th><th></th></tr></thead><tbody id="empBody"></tbody></table></div>`;
+ $('#neSave').addEventListener('click',saveEmp);
+ const bk=$('#btnBulkEmp');if(bk)bk.addEventListener('click',()=>openBulkImport('employees'));
+ const ms=monthStart(today());
+ $('#empBody').innerHTML=DB.employees.map(e=>{
+  const rs=DB.records.filter(r=>r.empId===e.id&&r.date>=ms),w=rs.reduce((s,r)=>s+wageOf(r),0),q=rs.reduce((s,r)=>s+(r.qtyGood||0),0);
+  return `<tr><td>${esc(e.id)}</td><td style="font-weight:600">${esc(e.name)}</td><td><span class="badge blue">${esc(e.team)}</span></td><td>${esc(e.role)}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(w)}</td><td class="num">${q}</td><td style="white-space:nowrap">${isAdmin?`<button class="btn sm secondary" data-empedit="${esc(e.id)}" style="margin-right:4px">改</button><button class="btn sm danger" data-empdel="${esc(e.id)}">删</button>`:''}</td></tr>`;
+ }).join('')||'<tr><td colspan="7" class="empty">暂无员工</td></tr>';
+ $$('#empBody [data-empedit]').forEach(b=>b.addEventListener('click',()=>editEmp(b.dataset.empedit)));
+ $$('#empBody [data-empdel]').forEach(b=>b.addEventListener('click',()=>delEmp(b.dataset.empdel)));
 }
 function editEmp(id){
-  const e=DB.employees.find(x=>x.id===id);if(!e)return;
-  modal(`<h3>编辑员工 ${e.name}</h3>
-    <div class="form-row grid-2"><div><label>工号</label><input id="eeId" value="${e.id}"></div><div><label>姓名</label><input id="eeName" value="${e.name}"></div></div>
-    <div class="form-row grid-2"><div><label>班组</label><select id="eeTeam"><option ${e.team==='一班'?'selected':''}>一班</option><option ${e.team==='二班'?'selected':''}>二班</option><option ${e.team==='三班'?'selected':''}>三班</option></select></div><div><label>岗位</label><input id="eeRole" value="${e.role||''}"></div></div>
-    <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="saveEmpEdit('${id}')">保存</button></div>`);
+ const e=DB.employees.find(x=>x.id===id);if(!e)return;
+ modal(`<h3>编辑员工 ${esc(e.name)}</h3>
+  <div class="form-row grid-2"><div><label>工号</label><input id="eeId" value="${esc(e.id)}"></div><div><label>姓名</label><input id="eeName" value="${esc(e.name)}"></div></div>
+  <div class="form-row grid-2"><div><label>班组</label><select id="eeTeam"><option ${e.team==='一班'?'selected':''}>一班</option><option ${e.team==='二班'?'selected':''}>二班</option><option ${e.team==='三班'?'selected':''}>三班</option></select></div><div><label>岗位</label><input id="eeRole" value="${esc(e.role)}"></div></div>
+  <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" id="eeSave">保存</button></div>`);
+ $('#eeSave').addEventListener('click',()=>saveEmpEdit(id));
 }
-function saveEmpEdit(id){
-  const e=DB.employees.find(x=>x.id===id);if(!e)return;
-  const nid=$('#eeId').value.trim(),nname=$('#eeName').value.trim();
-  if(!nid||!nname){toast('工号姓名必填',true);return}
-  if(nid!==id&&DB.employees.find(x=>x.id===nid)){toast('工号已存在',true);return}
-  // 同步更新所有历史记录的empId
+async function saveEmpEdit(id){
+ const nid=$('#eeId').value.trim(),name=$('#eeName').value.trim();
+ if(!nid||!name){toast('工号姓名必填',true);return}
+ if(nid!==id&&DB.employees.find(x=>x.id===nid)){toast('工号已存在',true);return}
+ const row={id:nid,name,team:$('#eeTeam').value,role:$('#eeRole').value.trim()};
+ try{
+  await apiUpdate('employees','id',id,row);
   if(nid!==id)DB.records.forEach(r=>{if(r.empId===id)r.empId=nid});
-  e.id=nid;e.name=nname;e.team=$('#eeTeam').value;e.role=$('#eeRole').value;e.updated_at=tsNow();
-  save();closeModal();toast('已保存');render();
+  audit('修改员工',nid,row);closeModal();toast('已保存');
+ }catch(e){toast('保存失败：'+e.message,true)}
 }
-function saveEmp(){const id=$('#neId').value.trim(),name=$('#neName').value.trim();if(!id||!name){toast('工号姓名必填',true);return}if(DB.employees.find(e=>e.id===id)){toast('工号已存在',true);return}DB.employees.push({id,name,team:$('#neTeam').value,role:$('#neRole').value,updated_at:tsNow()});save();toast('已添加');render()}
-function delEmp(id){if(!confirm('删除员工？'))return;markDeleted('employees',id);DB.employees=DB.employees.filter(e=>e.id!==id);save();render();toast('已删除')}
+async function saveEmp(){
+ const id=$('#neId').value.trim(),name=$('#neName').value.trim();
+ if(!id||!name){toast('工号姓名必填',true);return}
+ if(DB.employees.find(e=>e.id===id)){toast('工号已存在',true);return}
+ const row={id,name,team:$('#neTeam').value,role:$('#neRole').value.trim(),active:true};
+ try{await apiCreate('employees',row);audit('新增员工',id,row);toast('已添加')}
+ catch(e){toast('保存失败：'+e.message,true)}
+}
+async function delEmp(id){
+ if(!confirm('确定删除该员工？其历史生产记录将一并受影响，建议改为停用。'))return;
+ try{await apiDelete('employees','id',id);audit('删除员工',id,null);toast('已删除')}
+ catch(e){toast('删除失败（可能仍有生产记录关联）：'+e.message,true)}
+}
 
-/* ==== 产品工价 ==== */
+/* ===== 产品工价 ===== */
 function renderProducts(c){
-  c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">工价管理<div style="display:flex;gap:8px"><input type="text" id="prodKw" placeholder="搜索产品/工序..." style="width:180px"><button class="btn sm secondary" onclick="openBulkImport('products')">批量导入</button><button class="btn sm" onclick="openProductModal()">+ 添加</button></div></div></div>
-  <div class="card" style="padding:0;overflow:auto;max-height:70vh"><table><thead><tr><th>产品型号</th><th>款式</th><th>工序</th><th class="num">单件工价</th><th></th></tr></thead><tbody id="prodBody"></tbody></table></div>`;
-  $('#prodKw').addEventListener('input',renderProdTable);
-  renderProdTable();
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">工价管理<div style="display:flex;gap:8px">
+   <input type="text" id="prodKw" placeholder="搜索产品/工序..." style="width:180px">
+   <button class="btn sm secondary admin-only" id="btnBulkProd">批量导入</button>
+   <button class="btn sm admin-only" id="btnAddProd">+ 添加</button></div></div></div>
+ <div class="card" style="padding:0;overflow:auto;max-height:70vh"><table><thead><tr><th>产品型号</th><th>款式</th><th>工序</th><th class="num">单件工价</th><th></th></tr></thead><tbody id="prodBody"></tbody></table></div>`;
+ $('#prodKw').addEventListener('input',renderProdTable);
+ const ba=$('#btnAddProd');if(ba)ba.addEventListener('click',openProductModal);
+ const bb=$('#btnBulkProd');if(bb)bb.addEventListener('click',()=>openBulkImport('products'));
+ renderProdTable();
 }
 function renderProdTable(){
-  const k=($('#prodKw').value||'').trim().toLowerCase();
-  const list=DB.products.filter(p=>!k||(p.model+p.style+p.process).toLowerCase().includes(k));
-  $('#prodBody').innerHTML=list.map(p=>`<tr><td>${p.model}</td><td>${p.style}</td><td>${p.process}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtPrice(p.price)}</td><td style="white-space:nowrap"><button class="btn sm secondary" onclick="editProduct(${p.id})" style="margin-right:4px">改</button><button class="btn sm danger" onclick="delProduct(${p.id})">删</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">无匹配</td></tr>';
+ const k=($('#prodKw').value||'').trim().toLowerCase();
+ const list=DB.products.filter(p=>!k||(p.model+p.style+p.process).toLowerCase().includes(k));
+ $('#prodBody').innerHTML=list.map(p=>
+  `<tr><td>${esc(p.model)}</td><td>${esc(p.style)}</td><td>${esc(p.process)}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtPrice(p.price)}</td><td style="white-space:nowrap">${isAdmin?`<button class="btn sm secondary" data-prodedit="${p.id}" style="margin-right:4px">改</button><button class="btn sm danger" data-proddel="${p.id}">删</button>`:''}</td></tr>`).join('')
+ ||'<tr><td colspan="5" class="empty">无匹配</td></tr>';
+ $$('#prodBody [data-prodedit]').forEach(b=>b.addEventListener('click',()=>editProduct(+b.dataset.prodedit)));
+ $$('#prodBody [data-proddel]').forEach(b=>b.addEventListener('click',()=>delProduct(+b.dataset.proddel)));
 }
 function editProduct(id){
-  const p=DB.products.find(x=>x.id===id);if(!p)return;
-  modal(`<h3>编辑工价</h3><div class="form-row"><label>产品型号</label><input id="epModel" value="${p.model}"></div><div class="form-row grid-3"><div><label>款式</label><input id="epStyle" value="${p.style}"></div><div><label>工序</label><input id="epProcess" value="${p.process}"></div><div><label>工价</label><input type="number" id="epPrice" step="0.001" min="0" value="${p.price}"></div></div><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="saveProductEdit(${id})">保存</button></div>`);
+ const p=DB.products.find(x=>x.id===id);if(!p)return;
+ modal(`<h3>编辑工价</h3>
+  <div class="form-row"><label>产品型号</label><input id="epModel" value="${esc(p.model)}"></div>
+  <div class="form-row grid-3"><div><label>款式</label><input id="epStyle" value="${esc(p.style)}"></div><div><label>工序</label><input id="epProcess" value="${esc(p.process)}"></div><div><label>工价</label><input type="number" id="epPrice" step="0.0001" min="0" value="${p.price}"></div></div>
+  <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" id="epSave">保存</button></div>`);
+ $('#epSave').addEventListener('click',()=>saveProductEdit(id));
 }
-function saveProductEdit(id){
-  const p=DB.products.find(x=>x.id===id);if(!p)return;
-  p.model=$('#epModel').value.trim();p.style=$('#epStyle').value.trim();p.process=$('#epProcess').value.trim();p.price=+$('#epPrice').value||0;
-  p.updated_at=tsNow();
-  save();closeModal();toast('已保存');render();
+async function saveProductEdit(id){
+ const model=$('#epModel').value.trim(),style=$('#epStyle').value.trim(),process=$('#epProcess').value.trim(),price=+$('#epPrice').value||0;
+ if(!model||!style||!process){toast('请填完整',true);return}
+ try{await apiUpdate('products','id',id,{model,style,process,price});audit('修改工价',`${model}/${style}/${process}`,{price});closeModal();toast('已保存')}
+ catch(e){toast('保存失败：'+e.message,true)}
 }
-function openProductModal(){modal(`<h3>新增工价</h3><div class="form-row"><label>产品型号</label><input id="npModel"></div><div class="form-row grid-3"><div><label>款式</label><input id="npStyle"></div><div><label>工序</label><input id="npProcess"></div><div><label>工价</label><input type="number" id="npPrice" step="0.001" min="0" value="0"></div></div><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="saveProduct()">保存</button></div>`)}
-function saveProduct(){const m=$('#npModel').value.trim(),s=$('#npStyle').value.trim(),p=$('#npProcess').value.trim(),pr=+$('#npPrice').value||0;if(!m||!s||!p){toast('请填完整',true);return}DB.products.push({id:nextId(),model:m,style:s,process:p,price:pr,updated_at:tsNow()});save();closeModal();toast('已保存');render()}
-function delProduct(id){if(!confirm('删除？'))return;markDeleted('products',id);DB.products=DB.products.filter(p=>p.id!==id);save();render();toast('已删除')}
-
-/* ==== 批量导入 ==== */
-const IMPORT_TPL={
-  employees:{title:'批量导入员工',hint:'从Excel选4列（工号、姓名、班组、岗位）Ctrl+C粘贴',parse:p=>{const id=(p[0]||'').trim(),name=(p[1]||'').trim();if(!id||!name)return null;return{id,name,team:(p[2]||'一班').trim(),role:(p[3]||'').trim()}},commit:l=>{let n=0;l.forEach(o=>{if(!DB.employees.find(e=>e.id===o.id)){DB.employees.push(o);n++}});return n}},
-  products:{title:'批量导入工价',hint:'从Excel选4列（产品、款式、工序、工价）粘贴',parse:p=>{const m=(p[0]||'').trim(),s=(p[1]||'').trim(),pr=(p[2]||'').trim(),price=parseFloat(p[3]);if(!m||!s||!pr||isNaN(price))return null;return{model:m,style:s,process:pr,price}},commit:l=>{let n=0;l.forEach(o=>{if(!DB.products.find(x=>x.model===o.model&&x.style===o.style&&x.process===o.process)){DB.products.push({id:nextId(),...o,updated_at:tsNow()});n++}});return n}},
-  records:{title:'批量导入历史记录',hint:'7列：日期、工号、产品、款式、工序、合格数、不良数',parse:p=>{const d=(p[0]||'').trim(),id=(p[1]||'').trim(),m=(p[2]||'').trim(),s=(p[3]||'').trim(),pr=(p[4]||'').trim(),g=parseInt(p[5])||0,b=parseInt(p[6])||0;if(!d||!id||!m||!pr)return null;return{date:d,empId:id,model:m,style:s,process:pr,qtyGood:g,qtyBad:b,note:''}},commit:l=>{let n=0;l.forEach(o=>{DB.records.push({id:nextId(),...o,updated_at:tsNow()});n++});return n}}
-};
-function openBulkImport(type){const cfg=IMPORT_TPL[type];modal(`<h3>${cfg.title}</h3><div class="tip">${cfg.hint}</div><label>粘贴区域：</label><textarea id="bulkText" rows="8" style="width:100%;font-family:monospace;font-size:12px"></textarea><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" onclick="doBulkImport('${type}')">解析并导入</button></div>`)}
-function doBulkImport(type){const cfg=IMPORT_TPL[type];const text=$('#bulkText').value.trim();if(!text){toast('请先粘贴',true);return}const lines=text.split(/\r?\n/).filter(l=>l.trim());const list=[];let skip=0;lines.forEach((line,i)=>{const parts=line.split(/\t|,|，/);if(i===0&&/工号|姓名|产品|日期/.test(parts[0]))return;const o=cfg.parse(parts);if(o)list.push(o);else skip++});if(!list.length){toast('无有效数据',true);return}const n=cfg.commit(list);save();closeModal();toast(`导入 ${n} 条${skip?`，跳过 ${skip}`:''}`);render()}
-
-load();$('#todayPill').textContent='今天：'+today();navigate('dashboard');
-window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
-// 回车登录
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&$('#loginPage').style.display!=='none'){
-    if($('#loginForm').style.display!=='none')doLogin();else doSetup();
+function openProductModal(){
+ modal(`<h3>新增工价</h3>
+  <div class="form-row"><label>产品型号</label><input id="npModel"></div>
+  <div class="form-row grid-3"><div><label>款式</label><input id="npStyle"></div><div><label>工序</label><input id="npProcess"></div><div><label>工价</label><input type="number" id="npPrice" step="0.0001" min="0" value="0"></div></div>
+  <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" id="npSave">保存</button></div>`);
+ $('#npSave').addEventListener('click',saveProduct);
+}
+async function saveProduct(){
+ const model=$('#npModel').value.trim(),style=$('#npStyle').value.trim(),process=$('#npProcess').value.trim(),price=+$('#npPrice').value||0;
+ if(!model||!style||!process){toast('请填完整',true);return}
+ try{await apiCreate('products',{model,style,process,price});audit('新增工价',`${model}/${style}/${process}`,{price});closeModal();toast('已保存')}
+ catch(e){toast('保存失败（可能已存在相同工序）：'+e.message,true)}
+}
+async function delProduct(id){
+ if(!confirm('确定删除该工价？'))return;
+ try{await apiDelete('products','id',id);audit('删除工价',String(id),null);toast('已删除')}
+ catch(e){toast('删除失败：'+e.message,true)}
+}
+/* ===== VIEWS4 ===== */
+/* ===== 导出专业财务工资表 ===== */
+async function exportPayrollXlsx(){
+ try{
+  if(typeof ExcelJS==='undefined'){toast('Excel 组件未加载，请检查网络后刷新',true);return}
+  toast('正在生成...');
+  const ym=($('#sheetMonth')&&$('#sheetMonth').value)||today().slice(0,7);
+  const ms=monthStart(ym),mend=monthEnd(ym),dim=+mend.slice(8);
+  const records=DB.records.filter(r=>r.date>=ms&&r.date<=mend);
+  const LAST_COL=dim+4;
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet(ym.replace('-','年')+'月工资表',{views:[{state:'frozen',xSplit:2,ySplit:5}]});
+  ws.getColumn(1).width=5;ws.getColumn(2).width=10;
+  for(let d=1;d<=dim;d++)ws.getColumn(2+d).width=6;
+  ws.getColumn(dim+3).width=10;ws.getColumn(dim+4).width=10;ws.getColumn(dim+5).width=12;ws.getColumn(dim+6).width=18;
+  const NAVY='FF1B3A5C',NAVY2='FF2C5282',LIGHT='FFF7F9FC',GOLD='FFD4A84B',WHITE='FFFFFFFF',GRAY='FF718096',BORDER='FFD1D9E6',GREEN='FF2F855A';
+  const thinBorder={style:'thin',color:{argb:BORDER}};
+  const allBorder={top:thinBorder,left:thinBorder,bottom:thinBorder,right:thinBorder};
+  ws.mergeCells(1,1,1,LAST_COL+5);
+  let c=ws.getCell(1,1);c.value='嘉郁新材料科技有限公司';
+  c.font={name:'微软雅黑',size:18,bold:true,color:{argb:WHITE}};
+  c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};
+  c.alignment={horizontal:'center',vertical:'middle'};ws.getRow(1).height=40;
+  ws.mergeCells(2,1,2,LAST_COL+5);
+  c=ws.getCell(2,1);c.value='计 件 工 资 表';
+  c.font={name:'微软雅黑',size:14,bold:true,color:{argb:NAVY}};
+  c.fill={type:'pattern',pattern:'solid',fgColor:{argb:LIGHT}};
+  c.alignment={horizontal:'center',vertical:'middle'};ws.getRow(2).height=28;
+  ws.mergeCells(3,1,3,8);
+  c=ws.getCell(3,1);c.value='部门：生产车间';c.font={name:'微软雅黑',size:10};c.alignment={horizontal:'left',vertical:'middle'};
+  ws.mergeCells(3,9,3,20);
+  c=ws.getCell(3,9);c.value=ym.replace('-',' 年 ')+' 月份';c.font={name:'微软雅黑',size:10,bold:true,color:{argb:NAVY}};c.alignment={horizontal:'center',vertical:'middle'};
+  ws.mergeCells(3,21,3,LAST_COL+5);
+  c=ws.getCell(3,21);c.value='单位：元';c.font={name:'微软雅黑',size:9,color:{argb:GRAY}};c.alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(3).height=22;
+  ws.mergeCells(4,1,5,1);ws.getCell(4,1).value='序号';
+  ws.mergeCells(4,2,5,2);ws.getCell(4,2).value='姓名';
+  for(let d=1;d<=dim;d++)ws.mergeCells(4,2+d,5,2+d),ws.getCell(4,2+d).value=d;
+  ws.mergeCells(4,dim+3,5,dim+3);ws.getCell(4,dim+3).value='计件合计';
+  ws.mergeCells(4,dim+4,5,dim+4);ws.getCell(4,dim+4).value='计时合计';
+  ws.mergeCells(4,dim+5,5,dim+5);ws.getCell(4,dim+5).value='应发工资';
+  ws.mergeCells(4,dim+6,5,dim+6);ws.getCell(4,dim+6).value='备注';
+  for(let col=1;col<=LAST_COL+5;col++)for(let row=4;row<=5;row++){
+   c=ws.getCell(row,col);c.font={name:'微软雅黑',size:10,bold:true,color:{argb:WHITE}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY2}};
+   c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=allBorder;
   }
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();save();toast('已自动保存')}
-});
+  ws.getRow(4).height=24;ws.getRow(5).height=20;
+  let r=6,allPiece=0,allOt=0,allAmount=0;
+  DB.employees.forEach((e,ei)=>{
+   const rs=records.filter(x=>x.empId===e.id),bg=ei%2===0?LIGHT:WHITE;
+   ws.mergeCells(r,1,r+1,1);ws.getCell(r,1).value=ei+1;
+   ws.mergeCells(r,2,r+1,2);ws.getCell(r,2).value=e.name;
+   ws.mergeCells(r,dim+6,r+1,dim+6);
+   let pieceTotal=0,noteStr='';
+   for(let d=1;d<=dim;d++){
+    const ds=ym+'-'+pad2(d),dayRs=rs.filter(x=>x.date===ds);
+    const p=dayRs.reduce((s,x)=>s+wageOf(x),0);
+    const note=dayRs.map(x=>x.note).filter(Boolean).join(';');
+    const cell1=ws.getCell(r,2+d),cell2=ws.getCell(r+1,2+d);
+    if(p>0){cell1.value=+p.toFixed(2);cell1.numFmt='0.00';pieceTotal+=p;}
+    else if(note){cell1.value=note;cell1.font={name:'微软雅黑',size:9,italic:true,color:{argb:GRAY}};noteStr=note;}
+    cell1.alignment={horizontal:p>0?'right':'center',vertical:'middle'};
+    cell2.alignment={horizontal:'right',vertical:'middle'};
+    cell1.border=allBorder;cell2.border=allBorder;
+    cell1.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    cell2.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    cell2.font={name:'微软雅黑',size:9,color:{argb:GRAY}};
+   }
+   const time=DB.timeWages[ym+'_'+e.id]||0,total=pieceTotal+time;
+   allPiece+=pieceTotal;allOt+=time;allAmount+=total;
+   const ah=ws.getCell(r,dim+3);ah.value=+pieceTotal.toFixed(2);ah.numFmt='0.00';
+   const ai=ws.getCell(r,dim+4);ai.value=+time.toFixed(2);ai.numFmt='0.00';
+   const aj=ws.getCell(r,dim+5);aj.value=+total.toFixed(2);aj.numFmt='¥#,##0.00';
+   ws.getCell(r,dim+6).value=noteStr;
+   for(let col=1;col<=LAST_COL+5;col++)for(let row=r;row<=r+1;row++){
+    c=ws.getCell(row,col);c.border=allBorder;c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    if(col<=2){c.alignment={horizontal:'center',vertical:'middle'};c.font={name:'微软雅黑',size:10,bold:col===2};}
+    else if(col===dim+6){c.font={name:'微软雅黑',size:9,color:{argb:GRAY}};c.alignment={horizontal:'left',vertical:'middle',wrapText:true};}
+   }
+   ah.font={name:'微软雅黑',size:10,bold:true,color:{argb:NAVY}};
+   ai.font={name:'微软雅黑',size:10,color:{argb:GRAY}};
+   aj.font={name:'微软雅黑',size:11,bold:true,color:{argb:GREEN}};
+   ah.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
+   ai.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
+   aj.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEDF2F7'}};
+   ws.getRow(r).height=20;ws.getRow(r+1).height=18;r+=2;
+  });
+  ws.mergeCells(r,1,r,2);
+  c=ws.getCell(r,1);c.value='合 计';
+  for(let d=1;d<=dim;d++){
+   const ds=ym+'-'+pad2(d),tp=records.filter(x=>x.date===ds).reduce((s,x)=>s+wageOf(x),0);
+   if(tp>0){const cc=ws.getCell(r,2+d);cc.value=+tp.toFixed(2);cc.numFmt='0.00';cc.alignment={horizontal:'right',vertical:'middle'};}
+  }
+  ws.getCell(r,dim+3).value=+allPiece.toFixed(2);
+  ws.getCell(r,dim+4).value=+allOt.toFixed(2);
+  ws.getCell(r,dim+5).value=+allAmount.toFixed(2);ws.getCell(r,dim+5).numFmt='¥#,##0.00';
+  for(let col=1;col<=LAST_COL+5;col++){
+   c=ws.getCell(r,col);c.font={name:'微软雅黑',size:11,bold:true,color:{argb:WHITE}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:NAVY}};
+   c.alignment={horizontal:col<=2?'center':'right',vertical:'middle'};
+   c.border={top:{style:'medium',color:{argb:NAVY}},bottom:{style:'medium',color:{argb:NAVY}},left:thinBorder,right:thinBorder};
+  }
+  ws.getRow(r).height=28;r+=2;
+  ws.mergeCells(r,1,r,12);ws.getCell(r,1).value='审核签字：';
+  ws.mergeCells(r,14,r,25);ws.getCell(r,14).value='制表签字：';
+  ws.mergeCells(r,27,r,LAST_COL+5);ws.getCell(r,27).value='发放日期：    年   月   日';
+  for(let col=1;col<=LAST_COL+5;col++){c=ws.getCell(r,col);c.font={name:'微软雅黑',size:10};c.alignment={vertical:'middle'}}
+  ws.getRow(r).height=30;
+  ws.pageSetup={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.5,right:0.5,top:0.7,bottom:0.7}};
+  const buf=await wb.xlsx.writeBuffer(),blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`工资表_${ym}.xlsx`;a.click();
+  audit('导出财务工资表',ym,null);toast('已导出专业版工资表');
+ }catch(err){toast('导出失败: '+err.message,true)}
+}
+
+/* ===== 批量导入（行级批量写入）===== */
+async function bulkInsert(table,rows){
+ for(let i=0;i<rows.length;i+=100){
+  const {error}=await sb.from(table).insert(rows.slice(i,i+100));
+  if(error)throw error;
+ }
+}
+const IMPORT_TPL={
+ employees:{title:'批量导入员工',hint:'从 Excel 选 4 列（工号、姓名、班组、岗位）复制后粘贴；首行表头自动忽略。',
+  parse:p=>{const id=(p[0]||'').trim(),name=(p[1]||'').trim();if(!id||!name)return null;return{id,name,team:(p[2]||'一班').trim(),role:(p[3]||'').trim()}},
+  commit:async l=>{const ex=new Set(DB.employees.map(e=>e.id));const rows=l.filter(o=>!ex.has(o.id)).map(o=>({id:o.id,name:o.name,team:o.team||'一班',role:o.role||'',active:true}));await bulkInsert('employees',rows);return rows.length}},
+ products:{title:'批量导入工价',hint:'从 Excel 选 4 列（产品、款式、工序、工价）粘贴。',
+  parse:p=>{const m=(p[0]||'').trim(),s=(p[1]||'').trim(),pr=(p[2]||'').trim(),price=parseFloat(p[3]);if(!m||!s||!pr||isNaN(price))return null;return{model:m,style:s,process:pr,price}},
+  commit:async l=>{const ex=new Set(DB.products.map(p=>p.model+'|'+p.style+'|'+p.process));const rows=l.filter(o=>!ex.has(o.model+'|'+o.style+'|'+o.process)).map(o=>({model:o.model,style:o.style,process:o.process,price:o.price}));await bulkInsert('products',rows);return rows.length}},
+ records:{title:'批量导入历史记录',hint:'7 列：日期、工号、产品、款式、工序、合格数、不良数。',
+  parse:p=>{const d=(p[0]||'').trim(),id=(p[1]||'').trim(),m=(p[2]||'').trim(),s=(p[3]||'').trim(),pr=(p[4]||'').trim(),g=parseInt(p[5])||0,b=parseInt(p[6])||0;if(!d||!id||!m||!pr)return null;return{date:d,empId:id,model:m,style:s,process:pr,qtyGood:g,qtyBad:b,note:''}},
+  commit:async l=>{const k=r=>[r.date,r.empId,r.model,r.style,r.process,r.qtyGood,r.qtyBad].join('|');const ex=new Set(DB.records.map(k));const rows=l.filter(o=>!ex.has(k(o))).map(o=>({work_date:o.date,emp_id:o.empId,model:o.model,style:o.style,process:o.process,qty_good:o.qtyGood,qty_bad:o.qtyBad,note:o.note||''}));await bulkInsert('records',rows);return rows.length}}
+};
+function openBulkImport(type){
+ const cfg=IMPORT_TPL[type];
+ modal(`<h3>${cfg.title}</h3><div class="tip">${cfg.hint}</div><label>粘贴区域：</label><textarea id="bulkText" rows="8" style="width:100%;font-family:monospace;font-size:12px"></textarea>
+ <div class="modal-actions"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn" id="bulkGo">解析并导入</button></div>`);
+ $('#bulkGo').addEventListener('click',()=>doBulkImport(type));
+}
+async function doBulkImport(type){
+ const cfg=IMPORT_TPL[type],text=$('#bulkText').value.trim();
+ if(!text){toast('请先粘贴',true);return}
+ const lines=text.split(/\r?\n/).filter(l=>l.trim()),list=[],skips=[];
+ lines.forEach((line,i)=>{
+  const parts=line.split(/\t|,|，/);
+  if(i===0&&/工号|姓名|产品|日期/.test(parts[0]))return;
+  const o=cfg.parse(parts);if(o)list.push(o);else skips.push(i+1);
+ });
+ if(!list.length){toast('无有效数据',true);return}
+ try{
+  const n=await cfg.commit(list);
+  audit('批量导入',type,{导入:n,跳过:skips.length});
+  closeModal();toast(`导入 ${n} 条${skips.length?'，跳过 '+skips.length:''}`);
+ }catch(e){toast('导入失败：'+e.message,true)}
+}
+
+/* ===== 备份导出 / 导入 / 清空 ===== */
+function exportData(){
+ const out={employees:DB.employees,products:DB.products,records:DB.records,materials:DB.materials,timeWages:DB.timeWages};
+ const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='生产数据备份_'+today()+'.json';a.click();
+ toast('已导出备份');
+}
+async function doClearTables(){
+ const jobs=[['records','id',0],['materials','id',0],['products','id',0],['time_wages','id',''],['employees','id','']];
+ for(const [t,c,z]of jobs){const{error}=await sb.from(t).delete().neq(c,z);if(error)throw error}
+ DB={employees:[],products:[],records:[],materials:[],timeWages:{}};
+}
+async function clearAllData(){
+ if(!confirm('确定清空所有数据？\n将删除全部：生产记录、员工、产品工价、物料、计时工资。\n建议先点「导出备份」。此操作不可恢复！'))return;
+ if(!confirm('再次确认：真的要清空全部数据吗？'))return;
+ try{await doClearTables();audit('清空所有数据','all',null);render();toast('已清空')}
+ catch(e){toast('清空失败：'+e.message,true)}
+}
+function importData(e){
+ const f=e.target.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=async()=>{
+  try{
+   const p=JSON.parse(rd.result);
+   const replace=confirm('导入方式：\n\n【确定】合并导入：保留现有数据，只增补备份中的新内容（推荐，安全）\n【取消】完全替换：先清空现有数据，再按备份恢复');
+   if(!replace)await doClearTables();
+   let nEmp=0,nProd=0,nRec=0,nMat=0;
+   if(Array.isArray(p.employees)){
+    const ex=new Set(DB.employees.map(x=>x.id));
+    const rows=p.employees.filter(o=>o&&o.id&&!ex.has(o.id)).map(o=>({id:o.id,name:o.name,team:o.team||'一班',role:o.role||'',active:true}));
+    await bulkInsert('employees',rows);nEmp=rows.length;
+   }
+   if(Array.isArray(p.products)){
+    const ex=new Set(DB.products.map(x=>x.model+'|'+x.style+'|'+x.process));
+    const rows=p.products.filter(o=>o&&o.model&&!ex.has(o.model+'|'+o.style+'|'+o.process)).map(o=>({model:o.model,style:o.style,process:o.process,price:+o.price||0}));
+    await bulkInsert('products',rows);nProd=rows.length;
+   }
+   if(Array.isArray(p.records)){
+    const k=r=>[r.date,r.empId,r.model,r.style,r.process,r.qtyGood,r.qtyBad].join('|');
+    const ex=new Set(DB.records.map(k));
+    const rows=p.records.filter(o=>o&&o.date&&o.empId&&!ex.has(k({date:o.date,empId:o.empId,model:o.model,style:o.style,process:o.process,qtyGood:o.qtyGood,qtyBad:o.qtyBad})))
+     .map(o=>({work_date:o.date,emp_id:o.empId,model:o.model,style:o.style,process:o.process,qty_good:+o.qtyGood||0,qty_bad:+o.qtyBad||0,note:o.note||''}));
+    await bulkInsert('records',rows);nRec=rows.length;
+   }
+   if(Array.isArray(p.materials)){
+    const ex=new Set(DB.materials.map(m=>m.date+'|'+m.name));
+    const rows=p.materials.filter(o=>o&&o.name&&!ex.has(o.date+'|'+o.name)).map(o=>({work_date:o.date,name:o.name,spec:o.spec||'',unit:o.unit||'',qty:+o.qty||0,price:+o.price||0,person:o.person||''}));
+    await bulkInsert('materials',rows);nMat=rows.length;
+   }
+   if(p.timeWages&&typeof p.timeWages==='object'){
+    const rows=Object.entries(p.timeWages).filter(([id,amt])=>amt).map(([id,amt])=>{const[ym,emp]=id.split('_');return{id,ym,emp_id:emp,amount:+amt||0}});
+    if(rows.length){const{error}=await sb.from('time_wages').upsert(rows,{onConflict:'id'});if(error)throw error}
+   }
+   await loadAllData();render();
+   audit(replace?'合并导入备份':'替换导入备份',f.name,{员工:nEmp,工价:nProd,记录:nRec,物料:nMat});
+   toast(`导入完成：员工${nEmp}、工价${nProd}、记录${nRec}、物料${nMat}`);
+  }catch(err){toast('导入失败：'+err.message,true)}
+ };
+ rd.readAsText(f);e.target.value='';
+}
+
+/* ===== 启动：先加载 CDN（双源兜底），就绪后进入登录/系统 ===== */
+loadAll();
+
 </script>
 </body>
 </html>
