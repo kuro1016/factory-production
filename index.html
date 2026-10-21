@@ -298,6 +298,13 @@ function safeRender(){
  if(curView==='records'){if($('#filterEmp')){renderRecordsApply()}else render();return}
  if(curView==='payroll'){if($('#payEmp')){updatePayroll()}else render();return}
  if(curView==='materials'){if($('#matBody')){updateMatTable()}else render();return}
+ if(curView==='paysheet'){
+  const ae=document.activeElement;
+  if(ae&&ae.classList&&ae.classList.contains('time-wage'))return;
+  if($('#paysheetTable')){renderPaysheetData()}else render();return;
+ }
+ if(curView==='employees'){if($('#empBody')){renderEmpTable()}else render();return}
+ if(curView==='products'){if($('#prodBody')){renderProdTable()}else render();return}
  render();
 }
 
@@ -760,8 +767,12 @@ function renderEmployees(c){
  <div class="card" style="padding:0;overflow:auto"><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th>岗位</th><th class="num">本月工资</th><th class="num">本月产量</th><th></th></tr></thead><tbody id="empBody"></tbody></table></div>`;
  $('#neSave').addEventListener('click',saveEmp);
  const bk=$('#btnBulkEmp');if(bk)bk.addEventListener('click',()=>openBulkImport('employees'));
+ renderEmpTable();
+}
+function renderEmpTable(){
+ const body=$('#empBody');if(!body)return;
  const ms=monthStart(today());
- $('#empBody').innerHTML=DB.employees.map(e=>{
+ body.innerHTML=DB.employees.map(e=>{
   const rs=DB.records.filter(r=>r.empId===e.id&&r.date>=ms),w=rs.reduce((s,r)=>s+wageOf(r),0),q=rs.reduce((s,r)=>s+(r.qtyGood||0),0);
   return `<tr><td>${esc(e.id)}</td><td style="font-weight:600">${esc(e.name)}</td><td><span class="badge blue">${esc(e.team)}</span></td><td>${esc(e.role)}</td><td class="num" style="color:var(--accent);font-weight:600">${fmtMoney(w)}</td><td class="num">${q}</td><td style="white-space:nowrap">${isAdmin?`<button class="btn sm secondary" data-empedit="${esc(e.id)}" style="margin-right:4px">改</button><button class="btn sm danger" data-empdel="${esc(e.id)}">删</button>`:''}</td></tr>`;
  }).join('')||'<tr><td colspan="7" class="empty">暂无员工</td></tr>';
@@ -782,9 +793,11 @@ async function saveEmpEdit(id){
  if(nid!==id&&DB.employees.find(x=>x.id===nid)){toast('工号已存在',true);return}
  const row={id:nid,name,team:$('#eeTeam').value,role:$('#eeRole').value.trim()};
  try{
-  await apiUpdate('employees','id',id,row);
-  if(nid!==id)DB.records.forEach(r=>{if(r.empId===id)r.empId=nid});
-  audit('修改员工',nid,row);closeModal();toast('已保存');
+  const data=await apiUpdate('employees','id',id,row);
+  upsert(DB.employees,mapEmployee(data||{...row,active:true}));
+  if(nid!==id){DB.employees=DB.employees.filter(x=>x.id!==id);DB.records.forEach(r=>{if(r.empId===id)r.empId=nid})}
+  audit('修改员工',nid,row);
+  closeModal();renderEmpTable();toast('已保存');
  }catch(e){toast('保存失败：'+e.message,true)}
 }
 async function saveEmp(){
@@ -792,13 +805,24 @@ async function saveEmp(){
  if(!id||!name){toast('工号姓名必填',true);return}
  if(DB.employees.find(e=>e.id===id)){toast('工号已存在',true);return}
  const row={id,name,team:$('#neTeam').value,role:$('#neRole').value.trim(),active:true};
- try{await apiCreate('employees',row);audit('新增员工',id,row);toast('已添加')}
- catch(e){toast('保存失败：'+e.message,true)}
+ try{
+  const data=await apiCreate('employees',row);
+  upsert(DB.employees,mapEmployee(data||row));
+  audit('新增员工',id,row);
+  renderEmpTable();
+  $('#neId').value='';$('#neName').value='';$('#neRole').value='';
+  $('#neId').focus();
+  toast('已添加');
+ }catch(e){toast('保存失败：'+e.message,true)}
 }
 async function delEmp(id){
  if(!confirm('确定删除该员工？其历史生产记录将一并受影响，建议改为停用。'))return;
- try{await apiDelete('employees','id',id);audit('删除员工',id,null);toast('已删除')}
- catch(e){toast('删除失败（可能仍有生产记录关联）：'+e.message,true)}
+ try{
+  await apiDelete('employees','id',id);
+  DB.employees=DB.employees.filter(x=>x.id!==id);
+  audit('删除员工',id,null);
+  renderEmpTable();toast('已删除');
+ }catch(e){toast('删除失败（可能仍有生产记录关联）：'+e.message,true)}
 }
 
 /* ===== 产品工价 ===== */
@@ -833,8 +857,12 @@ function editProduct(id){
 async function saveProductEdit(id){
  const model=$('#epModel').value.trim(),style=$('#epStyle').value.trim(),process=$('#epProcess').value.trim(),price=+$('#epPrice').value||0;
  if(!model||!style||!process){toast('请填完整',true);return}
- try{await apiUpdate('products','id',id,{model,style,process,price});audit('修改工价',`${model}/${style}/${process}`,{price});closeModal();toast('已保存')}
- catch(e){toast('保存失败：'+e.message,true)}
+ try{
+  const data=await apiUpdate('products','id',id,{model,style,process,price});
+  upsert(DB.products,mapProduct(data||{id,model,style,process,price}));
+  audit('修改工价',`${model}/${style}/${process}`,{price});
+  closeModal();renderProdTable();toast('已保存');
+ }catch(e){toast('保存失败：'+e.message,true)}
 }
 function openProductModal(){
  modal(`<h3>新增工价</h3>
@@ -846,13 +874,21 @@ function openProductModal(){
 async function saveProduct(){
  const model=$('#npModel').value.trim(),style=$('#npStyle').value.trim(),process=$('#npProcess').value.trim(),price=+$('#npPrice').value||0;
  if(!model||!style||!process){toast('请填完整',true);return}
- try{await apiCreate('products',{model,style,process,price});audit('新增工价',`${model}/${style}/${process}`,{price});closeModal();toast('已保存')}
- catch(e){toast('保存失败（可能已存在相同工序）：'+e.message,true)}
+ try{
+  const data=await apiCreate('products',{model,style,process,price});
+  upsert(DB.products,mapProduct(data||{model,style,process,price}));
+  audit('新增工价',`${model}/${style}/${process}`,{price});
+  closeModal();renderProdTable();toast('已保存');
+ }catch(e){toast('保存失败（可能已存在相同工序）：'+e.message,true)}
 }
 async function delProduct(id){
  if(!confirm('确定删除该工价？'))return;
- try{await apiDelete('products','id',id);audit('删除工价',String(id),null);toast('已删除')}
- catch(e){toast('删除失败：'+e.message,true)}
+ try{
+  await apiDelete('products','id',id);
+  DB.products=DB.products.filter(x=>x.id!==id);
+  audit('删除工价',String(id),null);
+  renderProdTable();toast('已删除');
+ }catch(e){toast('删除失败：'+e.message,true)}
 }
 /* ===== VIEWS4 ===== */
 /* ===== 导出专业财务工资表 ===== */
