@@ -2,17 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>生产计件工资管理系统</title>
-<meta name="theme-color" content="#f97316">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%230f172a'/><rect x='132' y='252' width='58' height='88' rx='14' fill='%23fb923c'/><rect x='227' y='200' width='58' height='140' rx='14' fill='%23f97316'/><rect x='322' y='148' width='58' height='192' rx='14' fill='%23ea580c'/></svg>">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="生产管理">
-<meta name="application-name" content="生产管理">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
 <style>
 :root{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--line:#334155;--txt:#f1f5f9;--txt2:#94a3b8;--txt3:#64748b;--accent:#f97316;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--yellow:#facc15}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -91,50 +83,7 @@ td{padding:8px 10px;border-bottom:1px solid var(--line)}
 .admin-only{display:none}
 body.role-admin .admin-only{display:block}
 body.role-admin .nav-item.admin-only{display:flex}
-@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}}
-
-/* ===== 移动端：侧边栏抽屉化 ===== */
-.menu-btn{display:none;background:transparent;border:none;color:var(--txt);cursor:pointer;padding:8px;margin-right:6px;border-radius:6px}
-.menu-btn:hover{background:var(--bg3)}
-.menu-btn svg{width:23px;height:23px;display:block}
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
-.drawer-mask.show{opacity:1;pointer-events:auto}
-.topbar-left{display:flex;align-items:center}
-@media(max-width:820px){
-  :root{--sb:264px}
-  .menu-btn{display:block}
-  .sidebar{width:var(--sb);transform:translateX(-100%);transition:transform .26s ease;box-shadow:0 0 50px rgba(0,0,0,.55)}
-  .sidebar.open{transform:translateX(0)}
-  .main{margin-left:0}
-  .topbar{height:54px;padding:0 max(12px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
-  .content{left:0;top:54px;padding:max(14px,env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .kpi{padding:14px}
-  .kpi-value{font-size:19px}
-  .kpi-value small{font-size:11px}
-  .charts-grid{grid-template-columns:1fr;gap:10px}
-  .chart-box{height:280px}
-  .grid-3,.grid-4{grid-template-columns:1fr 1fr}
-  .grid-2{grid-template-columns:1fr}
-  .entry-row{grid-template-columns:1fr 1fr;gap:8px}
-  .entry-row.head{display:none}
-  .entry-row .row-del{grid-column:1/-1;justify-self:end}
-  .card{padding:16px}
-  .btn{padding:11px 16px;min-height:42px}
-  .btn.sm{min-height:36px;padding:8px 12px}
-  input,select,textarea{padding:11px 12px;min-height:42px;font-size:16px}
-  th,td{padding:9px 10px}
-  .today-pill{padding:6px 10px;font-size:12px}
-  .topbar-right{gap:8px;font-size:12px}
-  #cloudStatus{display:none}
-  .sheet-wrap{margin:0 -2px}
-  .paysheet td,.paysheet th{font-size:11px;padding:6px}
-  .side-foot .btn{min-height:38px}
-}
-@media(max-width:420px){
-  .grid-3,.grid-4{grid-template-columns:1fr}
-  .entry-row{grid-template-columns:1fr}
-}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}.entry-row{grid-template-columns:1fr 1fr}}
 @media print{.sidebar,.topbar,.side-foot,.no-print{display:none!important}.main{margin:0}body{background:#fff;color:#000}.card{border:1px solid #ccc}th{background:#eee!important;color:#000!important}}
 </style>
 </head>
@@ -148,8 +97,8 @@ body.role-admin .nav-item.admin-only{display:flex}
       <p style="font-size:12px;color:#64748b">请登录后使用</p>
     </div>
     <form id="loginForm" onsubmit="return doLogin(event)">
-      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">用户名</label><input id="loginUser" placeholder="admin" autocomplete="username" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:16px"></div>
-      <div style="margin-bottom:20px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">密码</label><input id="loginPass" type="password" placeholder="请输入密码" autocomplete="current-password" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:16px"></div>
+      <div style="margin-bottom:14px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">用户名</label><input id="loginUser" placeholder="admin" autocomplete="username" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
+      <div style="margin-bottom:20px"><label style="color:#94a3b8;font-size:12px;display:block;margin-bottom:6px">密码</label><input id="loginPass" type="password" placeholder="请输入密码" autocomplete="current-password" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:11px 14px;border-radius:8px;font-size:14px"></div>
       <button type="submit" id="loginBtn" style="width:100%;background:#f97316;color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">登 录</button>
       <p id="loginErr" style="color:#ef4444;font-size:12px;text-align:center;margin-top:12px;display:none"></p>
     </form>
@@ -177,9 +126,8 @@ body.role-admin .nav-item.admin-only{display:flex}
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     </div>
   </div>
-  <div class="drawer-mask" id="drawerMask" onclick="toggleDrawer(false)"></div>
   <div class="main">
-    <div class="topbar"><div class="topbar-left"><button class="menu-btn" type="button" onclick="toggleDrawer(true)" aria-label="打开菜单"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px"></span><span class="today-pill" id="todayPill"></span></div></div>
+    <div class="topbar"><div class="topbar-left"><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px"></span><span class="today-pill" id="todayPill"></span></div></div>
     <div class="content" id="content"></div>
   </div>
 </div>
@@ -344,8 +292,14 @@ function subscribeRealtime(){
   ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>onRowChange(t,p)));
  ch.subscribe();
 }
-/* 录入页/弹窗打开时不打断输入，其余视图实时刷新 */
-function safeRender(){if(curView==='entry'||modalOpen())return;render()}
+/* 录入页/弹窗打开时不打断输入；记录/工资页只刷新数据区、保留筛选器与输入焦点；其余视图整体重绘 */
+function safeRender(){
+ if(curView==='entry'||modalOpen())return;
+ if(curView==='records'){if($('#filterEmp')){renderRecordsApply()}else render();return}
+ if(curView==='payroll'){if($('#payEmp')){updatePayroll()}else render();return}
+ if(curView==='materials'){if($('#matBody')){updateMatTable()}else render();return}
+ render();
+}
 
 /* ---- 启动 ---- */
 let curView='dashboard';
@@ -376,17 +330,12 @@ async function boot(){
 /* ===== VIEWS ===== */
 const TITLES={dashboard:'生产仪表盘',entry:'生产录入',records:'生产记录',payroll:'工资汇总',paysheet:'当月工资表',materials:'物料用量',employees:'员工管理',products:'产品工价'};
 let charts={};
-function toggleDrawer(open){
- $('.sidebar').classList.toggle('open',open);
- $('#drawerMask').classList.toggle('show',open);
-}
 function navigate(view){
  curView=view;
  $$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===view));
  $('#viewTitle').textContent=TITLES[view];
  Object.values(charts).forEach(c=>{try{c.dispose()}catch(_){}});
  charts={};render();
- toggleDrawer(false);
 }
 $('.nav').addEventListener('click',e=>{const it=e.target.closest('.nav-item');if(it)navigate(it.dataset.view)});
 function render(){
@@ -479,8 +428,8 @@ function addEntryRow(){
   <select class="e-model"><option value="">--选产品--</option>${productOptions().map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>
   <select class="e-style"><option value="">--选款式--</option></select>
   <select class="e-proc"><option value="">--选工序--</option></select>
-  <input type="number" class="e-qtygood" min="0" placeholder="合格数量" aria-label="合格数量">
-  <input type="number" class="e-qtybad" min="0" placeholder="不良数量" aria-label="不良数量">
+  <input type="number" class="e-qtygood" min="0" value="0">
+  <input type="number" class="e-qtybad" min="0" value="0">
   <div class="num e-wage" style="color:var(--accent);font-weight:600">¥0.00</div>
   <input type="text" class="e-note" placeholder="备注">
   <button class="row-del" type="button">×</button>`;
@@ -525,13 +474,14 @@ async function saveEntries(){
 }
 /* ===== VIEWS2 ===== */
 /* ===== 生产记录 ===== */
-let recPage=1;const REC_PAGE_SIZE=50;
+const REC_PAGE_SIZE=50;
+let recFilter={date:'',emp:'',kw:'',page:1};
 function canEdit(r){return isAdmin||r.createdBy===me.id}
 function renderRecords(c){
  c.innerHTML=`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap" class="no-print">
-   <input type="date" id="filterDate" style="width:160px">
-   <select id="filterEmp" style="width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</select>
-   <input type="text" id="filterKw" placeholder="搜索产品/工序/备注..." style="width:200px">
+   <input type="date" id="filterDate" style="width:160px" value="${esc(recFilter.date)}">
+   <select id="filterEmp" style="width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}" ${e.id===recFilter.emp?'selected':''}>${esc(e.name)}</option>`).join('')}</select>
+   <input type="text" id="filterKw" placeholder="搜索产品/工序/备注..." style="width:200px" value="${esc(recFilter.kw)}">
    <span style="flex:1"></span>
    <button class="btn sm secondary admin-only" id="btnBulkRec">批量导入</button>
    <span style="color:var(--txt2);font-size:12px" id="recCount"></span></div>
@@ -539,14 +489,14 @@ function renderRecords(c){
   <table><thead><tr><th>日期</th><th>员工</th><th>产品</th><th>款式</th><th>工序</th><th class="num">合格</th><th class="num">不良</th><th class="num">良品率</th><th class="num">工资</th><th>备注</th><th></th></tr></thead>
   <tbody id="recBody"></tbody></table></div>
  <div id="recPager" style="display:flex;gap:8px;justify-content:center;padding:14px 0;align-items:center" class="no-print"></div>`;
- $('#filterDate').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
- $('#filterEmp').addEventListener('change',()=>{recPage=1;renderRecordsApply()});
- $('#filterKw').addEventListener('input',()=>{recPage=1;renderRecordsApply()});
+ $('#filterDate').addEventListener('change',()=>{recFilter.date=$('#filterDate').value;recFilter.page=1;renderRecordsApply()});
+ $('#filterEmp').addEventListener('change',()=>{recFilter.emp=$('#filterEmp').value;recFilter.page=1;renderRecordsApply()});
+ $('#filterKw').addEventListener('input',()=>{recFilter.kw=$('#filterKw').value;recFilter.page=1;renderRecordsApply()});
  const bb=$('#btnBulkRec');if(bb)bb.addEventListener('click',()=>openBulkImport('records'));
  renderRecordsApply();
 }
 function getFilteredRecords(){
- const d=$('#filterDate').value,e=$('#filterEmp').value,k=($('#filterKw').value||'').trim().toLowerCase();
+ const d=recFilter.date,e=recFilter.emp,k=(recFilter.kw||'').trim().toLowerCase();
  let r=DB.records.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
  if(d)r=r.filter(x=>x.date===d);
  if(e)r=r.filter(x=>x.empId===e);
@@ -556,8 +506,8 @@ function getFilteredRecords(){
 function renderRecordsApply(){
  const r=getFilteredRecords();
  const totalPages=Math.max(1,Math.ceil(r.length/REC_PAGE_SIZE));
- if(recPage>totalPages)recPage=totalPages;
- const start=(recPage-1)*REC_PAGE_SIZE,pageData=r.slice(start,start+REC_PAGE_SIZE);
+ if(recFilter.page>totalPages)recFilter.page=totalPages;
+ const start=(recFilter.page-1)*REC_PAGE_SIZE,pageData=r.slice(start,start+REC_PAGE_SIZE);
  $('#recCount').textContent=`共 ${r.length} 条${r.length!==DB.records.length?'（筛选自 '+DB.records.length+' 条）':''}`;
  $('#recBody').innerHTML=pageData.map(x=>{
    const tot=x.qtyGood+x.qtyBad,rr=tot>0?x.qtyGood/tot:1;
@@ -566,10 +516,10 @@ function renderRecordsApply(){
  }).join('')||'<tr><td colspan="11" class="empty">无匹配记录</td></tr>';
  $$('#recBody [data-edit]').forEach(b=>b.addEventListener('click',()=>editRecord(+b.dataset.edit)));
  $$('#recBody [data-del]').forEach(b=>b.addEventListener('click',()=>delRecord(+b.dataset.del)));
- $('#recPager').innerHTML=`<button class="btn sm secondary" id="pgPrev" ${recPage<=1?'disabled style="opacity:.4"':''}>上一页</button><span style="color:var(--txt2);font-size:12px">第 ${recPage} / ${totalPages} 页</span><button class="btn sm secondary" id="pgNext" ${recPage>=totalPages?'disabled style="opacity:.4"':''}>下一页</button>`;
+ $('#recPager').innerHTML=`<button class="btn sm secondary" id="pgPrev" ${recFilter.page<=1?'disabled style="opacity:.4"':''}>上一页</button><span style="color:var(--txt2);font-size:12px">第 ${recFilter.page} / ${totalPages} 页</span><button class="btn sm secondary" id="pgNext" ${recFilter.page>=totalPages?'disabled style="opacity:.4"':''}>下一页</button>`;
  const pv=$('#pgPrev'),nx=$('#pgNext');
- if(pv&&recPage>1)pv.addEventListener('click',()=>{recPage--;renderRecordsApply()});
- if(nx&&recPage<totalPages)nx.addEventListener('click',()=>{recPage++;renderRecordsApply()});
+ if(pv&&recFilter.page>1)pv.addEventListener('click',()=>{recFilter.page--;renderRecordsApply()});
+ if(nx&&recFilter.page<totalPages)nx.addEventListener('click',()=>{recFilter.page++;renderRecordsApply()});
 }
 async function delRecord(id){
  if(!confirm('确定删除该条记录？'))return;
@@ -612,24 +562,24 @@ async function saveEditRecord(id){
 }
 
 /* ===== 工资汇总（仅管理员）===== */
+let payFilter={date:today(),month:today().slice(0,7),emp:''};
 function renderPayroll(c){
- const t=today(),ym=t.slice(0,7);
  c.innerHTML=`<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-   <div><label>① 查单日</label><input type="date" id="payDate" value="${esc(t)}"></div>
-   <div><label>② 选月份</label><input type="month" id="payMonth" value="${esc(ym)}"></div>
-   <div><label>③ 选员工</label><select id="payEmp" style="min-width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}">${esc(e.id)} ${esc(e.name)}</option>`).join('')}</select></div>
+   <div><label>① 查单日</label><input type="date" id="payDate" value="${esc(payFilter.date)}"></div>
+   <div><label>② 选月份</label><input type="month" id="payMonth" value="${esc(payFilter.month)}"></div>
+   <div><label>③ 选员工</label><select id="payEmp" style="min-width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}" ${e.id===payFilter.emp?'selected':''}>${esc(e.id)} ${esc(e.name)}</option>`).join('')}</select></div>
    <div style="flex:1"></div>
    <button class="btn sm secondary" id="btnExportMonth">导出月度汇总(xlsx)</button></div></div>
  <div class="card" style="margin-bottom:14px"><div class="card-title" id="dayTitle">当日明细</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">产量</th><th class="num">工资</th><th>记录数</th></tr></thead><tbody id="dayBody"></tbody></table></div>
  <div class="card"><div class="card-title" id="monthTitle">月度累计</div><table><thead><tr><th>工号</th><th>姓名</th><th>班组</th><th class="num">出勤</th><th class="num">产量</th><th class="num">工资</th><th class="num">日均</th><th class="num">排名</th></tr></thead><tbody id="monthBody"></tbody></table></div>`;
- $('#payDate').addEventListener('change',updatePayroll);
- $('#payMonth').addEventListener('change',updatePayroll);
- $('#payEmp').addEventListener('change',updatePayroll);
+ $('#payDate').addEventListener('change',()=>{payFilter.date=$('#payDate').value;updatePayroll()});
+ $('#payMonth').addEventListener('change',()=>{payFilter.month=$('#payMonth').value;updatePayroll()});
+ $('#payEmp').addEventListener('change',()=>{payFilter.emp=$('#payEmp').value;updatePayroll()});
  $('#btnExportMonth').addEventListener('click',exportMonthSummary);
  updatePayroll();
 }
 function updatePayroll(){
- const d=$('#payDate').value,ym=$('#payMonth').value,ef=$('#payEmp').value;
+ const d=payFilter.date,ym=payFilter.month,ef=payFilter.emp;
  $('#dayTitle').textContent=`当日明细（${d}）`;
  const dayR=DB.records.filter(r=>r.date===d&&(!ef||r.empId===ef));
  let h='',tq=0,tw=0;
@@ -692,16 +642,16 @@ async function exportMonthSummary(){
 }
 
 /* ===== 工资表（矩阵，仅管理员）===== */
+let sheetMonthYM=today().slice(0,7);
 function renderPaysheet(c){
- const ym=today().slice(0,7);
  c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-   <div><label>选择月份</label><input type="month" id="sheetMonth" value="${esc(ym)}"></div><div style="flex:1"></div>
+   <div><label>选择月份</label><input type="month" id="sheetMonth" value="${esc(sheetMonthYM)}"></div><div style="flex:1"></div>
    <button class="btn sm secondary" id="btnSaveTime">保存计时工资</button>
    <button class="btn sm" style="background:var(--green)" id="btnExportPay">导出财务工资表(xlsx)</button>
    <button class="btn sm secondary" id="btnPrintPay">打印/导出PDF</button></div>
  <div class="tip no-print">每天计件工资自动从生产记录带出；黄色「计时工资」列填加班费/补贴，应发总工资 = 计件 + 计时。</div>
  <div class="sheet-wrap"><table class="paysheet" id="paysheetTable"></table></div>`;
- $('#sheetMonth').addEventListener('change',renderPaysheetData);
+ $('#sheetMonth').addEventListener('change',()=>{sheetMonthYM=$('#sheetMonth').value;renderPaysheetData()});
  $('#btnSaveTime').addEventListener('click',async()=>{
   // 计时工资在输入时已即时保存，这里给确认反馈
   toast('计时工资已保存')});
@@ -716,7 +666,7 @@ async function saveTimeWage(ym,empId,amount){
  DB.timeWages[id]=amount;
 }
 function renderPaysheetData(){
- const ym=$('#sheetMonth').value||today().slice(0,7);
+ const ym=sheetMonthYM||today().slice(0,7);
  const ms=monthStart(ym),dim=+monthEnd(ym).slice(8);
  const records=DB.records.filter(r=>r.date>=ms&&r.date<=monthEnd(ym));
  let html=`<thead><tr><th class="emp-col">工号</th><th class="emp-col">姓名</th>`;
@@ -1125,10 +1075,6 @@ function importData(e){
 /* ===== 启动：先加载 CDN（双源兜底），就绪后进入登录/系统 ===== */
 loadAll();
 
-/* 注册 PWA Service Worker（仅 http/https；file:// 本地打开时不注册）*/
-if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
- window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
 </script>
 </body>
 </html>
