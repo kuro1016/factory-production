@@ -83,8 +83,43 @@ td{padding:8px 10px;border-bottom:1px solid var(--line)}
 .admin-only{display:none}
 body.role-admin .admin-only{display:block}
 body.role-admin .nav-item.admin-only{display:flex}
+/* 汉堡按钮 / 侧边栏遮罩 / 录入小标签（仅手机显示） */
+.menu-toggle{display:none;background:transparent;border:none;color:var(--txt);font-size:22px;cursor:pointer;padding:4px 8px;margin-right:8px;line-height:1}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99}
+.cell-label{display:none}
+/* 筛选汇总条 */
+.filter-sum{display:flex;gap:16px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;align-items:center}
+.filter-sum .fs-item{color:var(--txt2)}.filter-sum .fs-item b{color:var(--txt);font-size:14px;margin-left:4px}
 @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.charts-grid{grid-template-columns:1fr}.entry-row{grid-template-columns:1fr 1fr}}
-@media print{.sidebar,.topbar,.side-foot,.no-print{display:none!important}.main{margin:0}body{background:#fff;color:#000}.card{border:1px solid #ccc}th{background:#eee!important;color:#000!important}}
+@media(max-width:760px){
+ .menu-toggle{display:block}
+ .sidebar-backdrop.show{display:block}
+ .sidebar{transform:translateX(-100%);transition:transform .25s ease;width:260px;z-index:200}
+ .sidebar.open{transform:translateX(0)}
+ .main{margin-left:0}
+ .content{left:0;padding:14px}
+ .topbar{padding:0 12px;height:52px}
+ .topbar-left{display:flex;align-items:center}
+ .topbar-left h2{font-size:15px}
+ .topbar-right{gap:8px}
+ .topbar-right .today-pill{padding:5px 10px;font-size:12px}
+ #cloudStatus{display:none}
+ .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+ .kpi{padding:14px}.kpi-value{font-size:19px}
+ .charts-grid{grid-template-columns:1fr;gap:12px}
+ .chart-box{height:270px}
+ .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+ .entry-row{grid-template-columns:1fr;gap:6px;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+ .entry-row.head{display:none}
+ .cell-label{display:block;font-size:11px;color:var(--txt2);margin-bottom:2px}
+ .card{padding:14px}
+ .filter-bar{flex-direction:column;align-items:stretch!important;gap:8px!important}
+ .filter-bar input,.filter-bar select{width:100%!important}
+ .filter-sum{gap:8px;font-size:12px}
+ .modal{width:100%;max-width:100%}
+ .toast{left:14px;right:14px;top:14px;text-align:center}
+}
+@media print{.sidebar,.topbar,.side-foot,.no-print,.menu-toggle{display:none!important}.main{margin:0}body{background:#fff;color:#000}.card{border:1px solid #ccc}th{background:#eee!important;color:#000!important}}
 </style>
 </head>
 <body>
@@ -105,6 +140,7 @@ body.role-admin .nav-item.admin-only{display:flex}
   </div>
 </div>
 <div class="app" id="appRoot" style="display:none">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <div class="sidebar">
     <div class="logo"><h1>🏭 生产管理系统</h1><p>计件工资 · 云端版 v2.0</p></div>
     <div class="nav" id="nav">
@@ -127,7 +163,7 @@ body.role-admin .nav-item.admin-only{display:flex}
     </div>
   </div>
   <div class="main">
-    <div class="topbar"><div class="topbar-left"><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px"></span><span class="today-pill" id="todayPill"></span></div></div>
+    <div class="topbar"><div class="topbar-left"><button class="menu-toggle" id="menuToggle" aria-label="打开菜单"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button><h2 id="viewTitle">生产仪表盘</h2></div><div class="topbar-right"><span id="cloudStatus" style="color:var(--txt3);font-size:12px"></span><span class="today-pill" id="todayPill"></span></div></div>
     <div class="content" id="content"></div>
   </div>
 </div>
@@ -343,13 +379,19 @@ function navigate(view){
  $('#viewTitle').textContent=TITLES[view];
  Object.values(charts).forEach(c=>{try{c.dispose()}catch(_){}});
  charts={};render();
+ if(window.innerWidth<=760)closeSidebar();
 }
 $('.nav').addEventListener('click',e=>{const it=e.target.closest('.nav-item');if(it)navigate(it.dataset.view)});
+/* 手机端抽屉式侧边栏 */
+function openSidebar(){$('.sidebar').classList.add('open');$('#sidebarBackdrop').classList.add('show')}
+function closeSidebar(){$('.sidebar').classList.remove('open');$('#sidebarBackdrop').classList.remove('show')}
+$('#menuToggle').addEventListener('click',openSidebar);
+$('#sidebarBackdrop').addEventListener('click',closeSidebar);
 function render(){
  const c=$('#content');
  ({dashboard:renderDashboard,entry:renderEntry,records:renderRecords,payroll:renderPayroll,paysheet:renderPaysheet,materials:renderMaterials,employees:renderEmployees,products:renderProducts})[curView](c);
 }
-window.addEventListener('resize',()=>Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}}));
+window.addEventListener('resize',()=>{Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}});if(window.innerWidth>760)closeSidebar()});
 
 /* ===== 仪表盘 ===== */
 let dashDate=today();
@@ -366,7 +408,7 @@ function renderDashboard(c){
  const mg=monthR.reduce((s,r)=>s+(r.qtyGood||0),0),mb=monthR.reduce((s,r)=>s+(r.qtyBad||0),0);
  const mw=monthR.reduce((s,r)=>s+wageOf(r),0);
  const rate=mg+mb>0?mg/(mg+mb):1;
- c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+ c.innerHTML=`<div class="card filter-bar no-print" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
    <label style="margin:0;color:var(--txt2)">查看日期：</label>
    <input type="date" id="dashDate" value="${esc(t)}">
    <button class="btn sm secondary" id="dashToday">回到今天</button>
@@ -431,14 +473,14 @@ function addEntryRow(){
  const div=document.createElement('div');div.className='entry-row';
  const wa=addDays(today(),-7);
  const empUsage=DB.employees.map(e=>({e,c:DB.records.filter(r=>r.empId===e.id&&r.date>=wa).length})).sort((a,b)=>b.c-a.c);
- div.innerHTML=`<select class="e-emp">${empUsage.map(x=>`<option value="${esc(x.e.id)}">${esc(x.e.id)} ${esc(x.e.name)}${x.c?' · 常用':''}</option>`).join('')}</select>
-  <select class="e-model"><option value="">--选产品--</option>${productOptions().map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>
-  <select class="e-style"><option value="">--选款式--</option></select>
-  <select class="e-proc"><option value="">--选工序--</option></select>
-  <input type="number" class="e-qtygood" min="0" value="0">
-  <input type="number" class="e-qtybad" min="0" value="0">
-  <div class="num e-wage" style="color:var(--accent);font-weight:600">¥0.00</div>
-  <input type="text" class="e-note" placeholder="备注">
+ div.innerHTML=`<span class="cell-label">员工</span><select class="e-emp">${empUsage.map(x=>`<option value="${esc(x.e.id)}">${esc(x.e.id)} ${esc(x.e.name)}${x.c?' · 常用':''}</option>`).join('')}</select>
+  <span class="cell-label">产品型号</span><select class="e-model"><option value="">--选产品--</option>${productOptions().map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>
+  <span class="cell-label">款式</span><select class="e-style"><option value="">--选款式--</option></select>
+  <span class="cell-label">工序</span><select class="e-proc"><option value="">--选工序--</option></select>
+  <span class="cell-label">合格数量</span><input type="number" class="e-qtygood" min="0" value="0">
+  <span class="cell-label">不良数量</span><input type="number" class="e-qtybad" min="0" value="0">
+  <span class="cell-label">工资</span><div class="num e-wage" style="color:var(--accent);font-weight:600">¥0.00</div>
+  <span class="cell-label">备注</span><input type="text" class="e-note" placeholder="备注">
   <button class="row-del" type="button">×</button>`;
  $('#entryRows').appendChild(div);
  $('.row-del',div).addEventListener('click',()=>div.remove());
@@ -482,30 +524,38 @@ async function saveEntries(){
 /* ===== VIEWS2 ===== */
 /* ===== 生产记录 ===== */
 const REC_PAGE_SIZE=50;
-let recFilter={date:'',emp:'',kw:'',page:1};
+let recFilter={date:'',month:'',emp:'',kw:'',page:1};
 function canEdit(r){return isAdmin||r.createdBy===me.id}
 function renderRecords(c){
- c.innerHTML=`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap" class="no-print">
-   <input type="date" id="filterDate" style="width:160px" value="${esc(recFilter.date)}">
+ c.innerHTML=`<div class="filter-bar no-print" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
    <select id="filterEmp" style="width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}" ${e.id===recFilter.emp?'selected':''}>${esc(e.name)}</option>`).join('')}</select>
+   <input type="month" id="filterMonth" style="width:160px" value="${esc(recFilter.month)}" title="选择月份，查看整月">
+   <input type="date" id="filterDate" style="width:160px" value="${esc(recFilter.date)}" title="或指定某一天（优先于月份）">
    <input type="text" id="filterKw" placeholder="搜索产品/工序/备注..." style="width:200px" value="${esc(recFilter.kw)}">
    <span style="flex:1"></span>
+   <button class="btn sm secondary" id="btnResetRec" title="清空筛选">重置</button>
+   <button class="btn sm secondary" id="btnExportRec">导出</button>
    <button class="btn sm secondary admin-only" id="btnBulkRec">批量导入</button>
    <span style="color:var(--txt2);font-size:12px" id="recCount"></span></div>
- <div class="card" style="padding:0;overflow:auto;max-height:65vh">
+ <div class="filter-sum" id="recFilterSum"></div>
+ <div class="card" style="padding:0;overflow:auto;max-height:60vh">
   <table><thead><tr><th>日期</th><th>员工</th><th>产品</th><th>款式</th><th>工序</th><th class="num">合格</th><th class="num">不良</th><th class="num">良品率</th><th class="num">工资</th><th>备注</th><th></th></tr></thead>
   <tbody id="recBody"></tbody></table></div>
  <div id="recPager" style="display:flex;gap:8px;justify-content:center;padding:14px 0;align-items:center" class="no-print"></div>`;
- $('#filterDate').addEventListener('change',()=>{recFilter.date=$('#filterDate').value;recFilter.page=1;renderRecordsApply()});
  $('#filterEmp').addEventListener('change',()=>{recFilter.emp=$('#filterEmp').value;recFilter.page=1;renderRecordsApply()});
+ $('#filterMonth').addEventListener('change',()=>{recFilter.month=$('#filterMonth').value;recFilter.page=1;renderRecordsApply()});
+ $('#filterDate').addEventListener('change',()=>{recFilter.date=$('#filterDate').value;recFilter.page=1;renderRecordsApply()});
  $('#filterKw').addEventListener('input',()=>{recFilter.kw=$('#filterKw').value;recFilter.page=1;renderRecordsApply()});
+ $('#btnResetRec').addEventListener('click',()=>{recFilter={date:'',month:'',emp:'',kw:'',page:1};renderRecords(c)});
+ $('#btnExportRec').addEventListener('click',exportRecordsXlsx);
  const bb=$('#btnBulkRec');if(bb)bb.addEventListener('click',()=>openBulkImport('records'));
  renderRecordsApply();
 }
 function getFilteredRecords(){
- const d=recFilter.date,e=recFilter.emp,k=(recFilter.kw||'').trim().toLowerCase();
+ const d=recFilter.date,m=recFilter.month,e=recFilter.emp,k=(recFilter.kw||'').trim().toLowerCase();
  let r=DB.records.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
  if(d)r=r.filter(x=>x.date===d);
+ else if(m)r=r.filter(x=>x.date.slice(0,7)===m);
  if(e)r=r.filter(x=>x.empId===e);
  if(k)r=r.filter(x=>(x.model+x.style+x.process+(x.note||'')).toLowerCase().includes(k));
  return r;
@@ -516,6 +566,8 @@ function renderRecordsApply(){
  if(recFilter.page>totalPages)recFilter.page=totalPages;
  const start=(recFilter.page-1)*REC_PAGE_SIZE,pageData=r.slice(start,start+REC_PAGE_SIZE);
  $('#recCount').textContent=`共 ${r.length} 条${r.length!==DB.records.length?'（筛选自 '+DB.records.length+' 条）':''}`;
+ const sg=r.reduce((s,x)=>s+(x.qtyGood||0),0),sb2=r.reduce((s,x)=>s+(x.qtyBad||0),0),sw2=r.reduce((s,x)=>s+wageOf(x),0),se2=new Set(r.map(x=>x.empId)).size;
+ const fs=$('#recFilterSum');if(fs)fs.innerHTML=`<span class="fs-item">记录<b>${r.length}</b> 条</span><span class="fs-item">合格<b>${sg}</b> 件</span><span class="fs-item">不良<b>${sb2}</b> 件</span><span class="fs-item">涉及<b>${se2}</b> 人</span><span class="fs-item">工资合计<b>¥${fmtMoney(sw2)}</b></span>`;
  $('#recBody').innerHTML=pageData.map(x=>{
    const tot=x.qtyGood+x.qtyBad,rr=tot>0?x.qtyGood/tot:1;
    const acts=canEdit(x)?`<button class="btn sm secondary" data-edit="${x.id}" style="margin-right:4px">改</button>${isAdmin?`<button class="btn sm danger" data-del="${x.id}">删</button>`:''}`:'<span style="color:var(--txt3);font-size:11px">仅查看</span>';
@@ -571,7 +623,7 @@ async function saveEditRecord(id){
 /* ===== 工资汇总（仅管理员）===== */
 let payFilter={date:today(),month:today().slice(0,7),emp:''};
 function renderPayroll(c){
- c.innerHTML=`<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="filter-bar" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
    <div><label>① 查单日</label><input type="date" id="payDate" value="${esc(payFilter.date)}"></div>
    <div><label>② 选月份</label><input type="month" id="payMonth" value="${esc(payFilter.month)}"></div>
    <div><label>③ 选员工</label><select id="payEmp" style="min-width:160px"><option value="">全部员工</option>${DB.employees.map(e=>`<option value="${esc(e.id)}" ${e.id===payFilter.emp?'selected':''}>${esc(e.id)} ${esc(e.name)}</option>`).join('')}</select></div>
@@ -648,10 +700,53 @@ async function exportMonthSummary(){
  }catch(e){toast('导出失败',true)}
 }
 
+/* 导出当前筛选条件下的生产记录 */
+async function exportRecordsXlsx(){
+ try{
+  if(typeof ExcelJS==='undefined'){toast('Excel 组件未加载',true);return}
+  const r=getFilteredRecords();
+  if(!r.length){toast('当前没有可导出的记录',true);return}
+  toast('生成中...');
+  const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('生产记录');
+  ws.columns=[{width:12},{width:9},{width:10},{width:16},{width:14},{width:14},{width:8},{width:8},{width:12},{width:20}];
+  ws.mergeCells(1,1,1,10);
+  const d=recFilter.date,m=recFilter.month,emp=recFilter.emp;
+  let title='生产记录 · ';
+  if(emp)title=empName(emp)+' · ';
+  if(d)title+=d;else if(m)title+=m.replace('-','年')+'月';else title+='全部';
+  ws.getCell(1,1).value=title;
+  ws.getCell(1,1).font={size:15,bold:true,color:{argb:'FFFFFFFF'}};
+  ws.getCell(1,1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}};
+  ws.getCell(1,1).alignment={horizontal:'center',vertical:'middle'};ws.getRow(1).height=32;
+  ['日期','工号','姓名','产品型号','款式','工序','合格','不良','工资','备注'].forEach((hh,i)=>{
+   const c=ws.getCell(2,i+1);c.value=hh;c.font={bold:true,color:{argb:'FFFFFFFF'}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2C5282'}};c.alignment={horizontal:'center'};
+  });
+  r.forEach((x,i)=>{
+   const rr=3+i;
+   ws.getCell(rr,1).value=x.date;ws.getCell(rr,2).value=x.empId;ws.getCell(rr,3).value=empName(x.empId);
+   ws.getCell(rr,4).value=x.model;ws.getCell(rr,5).value=x.style;ws.getCell(rr,6).value=x.process;
+   ws.getCell(rr,7).value=x.qtyGood;ws.getCell(rr,8).value=x.qtyBad;
+   ws.getCell(rr,9).value=+wageOf(x).toFixed(2);ws.getCell(rr,9).numFmt='¥#,##0.00';
+   ws.getCell(rr,10).value=x.note||'';
+   if(i%2===1)for(let c=1;c<=10;c++)ws.getCell(rr,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F9FC'}};
+  });
+  const tr=3+r.length;
+  ws.getCell(tr,1).value='合计';ws.mergeCells(tr,1,tr,6);
+  ws.getCell(tr,7).value=r.reduce((s,x)=>s+(x.qtyGood||0),0);
+  ws.getCell(tr,8).value=r.reduce((s,x)=>s+(x.qtyBad||0),0);
+  ws.getCell(tr,9).value=+r.reduce((s,x)=>s+wageOf(x),0).toFixed(2);ws.getCell(tr,9).numFmt='¥#,##0.00';
+  for(let c=1;c<=10;c++){ws.getCell(tr,c).font={bold:true,color:{argb:'FFFFFFFF'}};ws.getCell(tr,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B3A5C'}};}
+  const buf=await wb.xlsx.writeBuffer(),blob=new Blob([buf]),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=`生产记录_${(d||m||'全部')+(emp?'_'+emp:'')}.xlsx`;a.click();
+  audit('导出生产记录',title,null);toast('已导出 '+r.length+' 条');
+ }catch(e){toast('导出失败：'+e.message,true)}
+}
+
 /* ===== 工资表（矩阵，仅管理员）===== */
 let sheetMonthYM=today().slice(0,7);
 function renderPaysheet(c){
- c.innerHTML=`<div class="card no-print" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+ c.innerHTML=`<div class="card filter-bar no-print" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
    <div><label>选择月份</label><input type="month" id="sheetMonth" value="${esc(sheetMonthYM)}"></div><div style="flex:1"></div>
    <button class="btn sm secondary" id="btnSaveTime">保存计时工资</button>
    <button class="btn sm" style="background:var(--green)" id="btnExportPay">导出财务工资表(xlsx)</button>
@@ -827,8 +922,8 @@ async function delEmp(id){
 
 /* ===== 产品工价 ===== */
 function renderProducts(c){
- c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title">工价管理<div style="display:flex;gap:8px">
-   <input type="text" id="prodKw" placeholder="搜索产品/工序..." style="width:180px">
+ c.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="card-title" style="flex-wrap:wrap;gap:10px">工价管理<div style="display:flex;gap:8px;flex-wrap:wrap">
+   <input type="text" id="prodKw" placeholder="搜索产品/工序..." style="width:180px;flex:1;min-width:140px">
    <button class="btn sm secondary admin-only" id="btnBulkProd">批量导入</button>
    <button class="btn sm admin-only" id="btnAddProd">+ 添加</button></div></div></div>
  <div class="card" style="padding:0;overflow:auto;max-height:70vh"><table><thead><tr><th>产品型号</th><th>款式</th><th>工序</th><th class="num">单件工价</th><th></th></tr></thead><tbody id="prodBody"></tbody></table></div>`;
